@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-key="pageTitle">Báo cáo Phân tích Hiệu quả các Công cụ AI IDE</title>
+    <style>
+        /* General Styles */
+        @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Be Vietnam Pro', 'Noto Sans JP', -apple-system, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+        }
+        
+        /* Language Switcher */
+        .lang-switcher {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .lang-switcher button {
+            background-color: #f1f3f5;
+            border: 1px solid #dee2e6;
+            padding: 8px 15px;
+            margin-left: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .lang-switcher button:hover {
+            background-color: #e9ecef;
+        }
+        .lang-switcher button.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            margin-top: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 { text-align: center; border-bottom: 3px solid #3498db; font-size: 2.2em; margin-bottom: 30px; }
+        h2 { font-size: 1.8em; border-bottom: 2px solid #e9ecef; }
+        h3 { font-size: 1.4em; border-bottom: 1px solid #f1f1f1; }
+        h4 { font-size: 1.1em; border-bottom: none; margin-top: 20px; }
+
+        .summary-card { background-color: #eaf5ff; border-left: 5px solid #3498db; padding: 20px; margin: 25px 0; border-radius: 8px; }
+        .summary-card strong { color: #2980b9; }
+        
+        ul { padding-left: 20px; }
+        ul li { margin-bottom: 10px; }
+        .problem-list strong { color: #c0392b; }
+
+        blockquote { font-style: italic; color: #555; border-left: 4px solid #bdc3c7; padding-left: 15px; margin: 15px 0; background-color: #f9f9f9; padding-top: 8px; padding-bottom: 8px; border-radius: 0 5px 5px 0; }
+
+        .highlight { font-weight: bold; }
+        .text-danger { color: #e74c3c; font-weight: bold; }
+        .text-success { color: #27ae60; font-weight: bold; }
+
+        .chart-container { margin: 35px 0 45px 0; padding: 25px; background: #ffffff; border: 1px solid #e9ecef; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+        .chart-title { text-align: center; font-weight: 700; font-size: 1.2em; color: #34495e; margin-bottom: 25px; }
+        .bar-wrapper { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.95em; }
+        .bar-label { width: 130px; text-align: right; padding-right: 15px; flex-shrink: 0; font-weight: 500; color: #555; }
+        .bar-container { flex-grow: 1; background-color: #f1f3f5; border-radius: 5px; overflow: hidden; }
+
+        .bar { height: 32px; line-height: 32px; color: white; padding: 0 12px; border-radius: 5px; white-space: nowrap; font-weight: 500; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) inset; transition: width 0.8s cubic-bezier(0.25, 0.8, 0.25, 1); animation: slide-in 0.8s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        @keyframes slide-in { from { width: 0 !important; } }
+
+        .color-bad { background-image: linear-gradient(to right, #e74c3c, #c0392b); }
+        .color-avg { background-image: linear-gradient(to right, #f39c12, #e67e22); }
+        .color-good { background-image: linear-gradient(to right, #2ecc71, #27ae60); }
+        .color-equal { background-image: linear-gradient(to right, #95a5a6, #7f8c8d); }
+        .color-better { background-image: linear-gradient(to right, #5dade2, #3498db); }
+        .color-much-better { background-image: linear-gradient(to right, #3498db, #2980b9); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="lang-switcher">
+            <button id="lang-vi" class="active" onclick="setLanguage('vi')">Tiếng Việt</button>
+            <button id="lang-ja" onclick="setLanguage('ja')">日本語</button>
+        </div>
+
+        <h1 data-lang-key="mainTitle"></h1>
+
+        <section id="context">
+            <h2 data-lang-key="section1Title"></h2>
+            <p data-lang-key="section1Desc"></p>
+        </section>
+
+        <section id="summary">
+            <h2 data-lang-key="section2Title"></h2>
+            <div class="summary-card">
+                <p data-lang-key="summaryPara1"></p>
+                <p data-lang-key="summaryPara2"></p>
+                <p data-lang-key="summaryPara3"></p>
+                <p data-lang-key="summaryPara4"></p>
+            </div>
+        </section>
+
+        <section id="gemini-analysis">
+            <h2 data-lang-key="section3Title"></h2>
+            <h3 data-lang-key="section3aTitle"></h3>
+            <p data-lang-key="section3aDesc"></p>
+            
+            <div class="chart-container">
+                <div class="chart-title" data-lang-key="chart1Title"></div>
+                <div class="chart">
+                    <div class="bar-wrapper">
+                        <div class="bar-label" data-lang-key="chart1LabelBad"></div>
+                        <div class="bar-container">
+                            <div class="bar color-bad" style="width: 19%;"><span data-lang-key="chart1ValueBad"></span></div>
+                        </div>
+                    </div>
+                    <div class="bar-wrapper">
+                        <div class="bar-label" data-lang-key="chart1LabelAvg"></div>
+                        <div class="bar-container">
+                            <div class="bar color-avg" style="width: 62.5%;"><span data-lang-key="chart1ValueAvg"></span></div>
+                        </div>
+                    </div>
+                     <div class="bar-wrapper">
+                        <div class="bar-label" data-lang-key="chart1LabelGood"></div>
+                        <div class="bar-container">
+                            <div class="bar color-good" style="width: 19%;"><span data-lang-key="chart1ValueGood"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 data-lang-key="section3bTitle"></h3>
+            <ul class="problem-list">
+                <li>
+                    <strong data-lang-key="problem1Title"></strong>
+                    <p data-lang-key="problem1Desc"></p>
+                </li>
+                <li>
+                    <strong data-lang-key="problem2Title"></strong>
+                    <p data-lang-key="problem2Desc"></p>
+                </li>
+                <li>
+                    <strong data-lang-key="problem3Title"></strong>
+                    <p data-lang-key="problem3Desc"></p>
+                </li>
+            </ul>
+        </section>
+
+        <section id="comparison">
+            <h2 data-lang-key="section4Title"></h2>
+            <h3 data-lang-key="section4aTitle"></h3>
+            <p data-lang-key="section4aDesc"></p>
+
+            <div class="chart-container">
+                <div class="chart-title" data-lang-key="chart2Title"></div>
+                <div class="chart">
+                    <div class="bar-wrapper">
+                        <div class="bar-label" data-lang-key="chartLabelEqual"></div>
+                        <div class="bar-container">
+                            <div class="bar color-equal" style="width: 7%;"><span data-lang-key="chart2ValueEqual"></span></div>
+                        </div>
+                    </div>
+                    <div class="bar-wrapper">
+                        <div class="bar-label" data-lang-key="chartLabelSlightlyBetter"></div>
+                        <div class="bar-container">
+                            <div class="bar color-better" style="width: 17%;"><span data-lang-key="chart2ValueSlightlyBetter"></span></div>
+                        </div>
+                    </div>
+                    <div class="bar-wrapper">
+                        <div class="bar-label" data-lang-key="chartLabelMuchBetter"></div>
+                        <div class="bar-container">
+                            <div class="bar color-much-better" style="width: 76%;"><span data-lang-key="chart2ValueMuchBetter"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h4 data-lang-key="cursorStrengthsTitle"></h4>
+            <ul>
+                <li data-lang-key="cursorStrength1"></li>
+                <li data-lang-key="cursorStrength2"></li>
+                <li data-lang-key="cursorStrength3"></li>
+                <li data-lang-key="cursorStrength4"></li>
+            </ul>
+
+            <h3 data-lang-key="section4bTitle"></h3>
+            <p data-lang-key="section4bDesc"></p>
+
+            <div class="chart-container">
+                <div class="chart-title" data-lang-key="chart3Title"></div>
+                <div class="chart">
+                    <div class="bar-wrapper">
+                        <div class="bar-label" data-lang-key="chartLabelWorse"></div>
+                        <div class="bar-container">
+                            <div class="bar color-bad" style="width: 8%;"><span data-lang-key="chart3ValueWorse"></span></div>
+                        </div>
+                    </div>
+                    <div class="bar-wrapper">
+                        <div class="bar-label" data-lang-key="chartLabelEqual"></div>
+                        <div class="bar-container">
+                            <div class="bar color-equal" style="width: 17%;"><span data-lang-key="chart3ValueEqual"></span></div>
+                        </div>
+                    </div>
+                    <div class="bar-wrapper">
+                        <div class="bar-label" data-lang-key="chartLabelSlightlyBetter"></div>
+                        <div class="bar-container">
+                            <div class="bar color-better" style="width: 42%;"><span data-lang-key="chart3ValueSlightlyBetter"></span></div>
+                        </div>
+                    </div>
+                     <div class="bar-wrapper">
+                        <div class="bar-label" data-lang-key="chartLabelMuchBetter"></div>
+                        <div class="bar-container">
+                            <div class="bar color-much-better" style="width: 33%;"><span data-lang-key="chart3ValueMuchBetter"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h4 data-lang-key="copilotStrengthsTitle"></h4>
+            <ul>
+                <li data-lang-key="copilotStrength1"></li>
+                <li data-lang-key="copilotStrength2"></li>
+            </ul>
+        </section>
+    </div>
+
+<script>
+const translations = {
+    vi: {
+        pageTitle: "Báo cáo Phân tích Hiệu quả các Công cụ AI IDE",
+        mainTitle: "Báo cáo Phân tích Hiệu quả các Công cụ AI IDE",
+        section1Title: "1. Bối cảnh Khảo sát",
+        section1Desc: "Báo cáo được tổng hợp từ khảo sát thực hiện vào cuối tháng 9/2025 với <span class='highlight'>46 lập trình viên</span> tại công ty. Trong đó, có <span class='highlight'>83% (39 người) trên 5 năm kinh nghiệm</span>, chủ yếu ở các mảng Backend và Frontend.",
+        section2Title: "2. Tóm tắt Kết quả Chính",
+        summaryPara1: "Phân tích dữ liệu cho thấy <strong class='text-danger'>Gemini Code Assist chưa đáp ứng được kỳ vọng và yêu cầu công việc</strong> của đội ngũ phát triển Dr.JOY.",
+        summaryPara2: "<strong>Hơn 80%</strong> đánh giá công cụ chỉ ở mức trung bình hoặc kém, với lý do chính là hiệu suất chậm, chất lượng gợi ý thiếu tin cậy và trải nghiệm người dùng kém.",
+        summaryPara3: "Trong khi đó, <strong class='text-success'>Cursor AI Editor được 93% người dùng khẳng định là vượt trội hơn hẳn</strong>.",
+        summaryPara4: "<strong>Đề xuất:</strong> Cân nhắc không gia hạn Gemini Code Assist vào tháng 3 sang năm và chuyển hướng nguồn lực sang thử nghiệm và áp dụng các công cụ hiệu quả hơn như Cursor AI.",
+        section3Title: "3. Phân tích Chi tiết: Gemini Code Assist",
+        section3aTitle: "A. Đánh giá Chung: Mức độ Hài lòng Rất Thấp",
+        section3aDesc: "Trong số 46 người tham gia, chỉ có <strong>19%</strong> cảm thấy Gemini Code Assist hoạt động tốt. Ngược lại, có tới <strong>81%</strong> cho rằng công cụ chỉ ở mức trung bình hoặc kém.",
+        chart1Title: "Biểu đồ 1: Đánh giá Chất lượng Tổng thể của Gemini Code Assist",
+        chart1LabelBad: "Kém (1-2đ)",
+        chart1ValueBad: "19% (6 người)",
+        chart1LabelAvg: "Trung bình (3đ)",
+        chart1ValueAvg: "62.5% (20 người)",
+        chart1LabelGood: "Tốt (4-5đ)",
+        chart1ValueGood: "19% (6 người)",
+        section3bTitle: "B. Các Vấn đề Cốt lõi",
+        problem1Title: "Vấn đề #1: Tốc độ phản hồi quá chậm (The #1 Blocker)",
+        problem1Desc: "Đây là phàn nàn phổ biến nhất. Các nhận xét như <blockquote>\"Tốc độ phản hồi chậm\"</blockquote> và <blockquote>\"loading lâu rồi không trả về response gây khó chịu\"</blockquote> xuất hiện lặp đi lặp lại.",
+        problem2Title: "Vấn đề #2: Chất lượng Gợi ý Thấp và Không đáng tin cậy",
+        problem2Desc: "Nhiều developer báo cáo gợi ý sai logic và không phù hợp ngữ cảnh. Công cụ không hiểu sâu về codebase lớn. Các phản hồi tiêu biểu: <blockquote>\"Gợi ý không chính xác / sai logic\"</blockquote><blockquote>\"Khả năng làm việc với toàn bộ repository, nhiều file hạn chế\"</blockquote>",
+        problem3Title: "Vấn đề #3: Tích hợp Kém và Trải nghiệm Người dùng (UX) không tốt",
+        problem3Desc: "Nhiều người dùng gặp khó khăn trong việc đưa Gemini vào quy trình làm việc. Các lỗi giao diện như <blockquote>\"vấn đề bị cut chữ\"</blockquote> hay <blockquote>\"câu trả lời dài, thao tác chưa thân thiện\"</blockquote> cũng làm giảm trải nghiệm.",
+        section4Title: "4. So sánh Trực tiếp với Cursor AI và Copilot",
+        section4aTitle: "A. Gemini Code Assist vs. Cursor AI",
+        section4aDesc: "Dựa trên phản hồi từ 29 người đã dùng cả hai công cụ, <strong>Cursor AI thể hiện sự vượt trội rõ rệt.</strong>",
+        chart2Title: "Biểu đồ 2: Đánh giá Cursor AI so với Gemini Code Assist",
+        chartLabelEqual: "Tương đương",
+        chartLabelSlightlyBetter: "Hơi tốt hơn",
+        chartLabelMuchBetter: "Tốt hơn nhiều",
+        chartLabelWorse: "Kém hơn",
+        chart2ValueEqual: "7% (2 người)",
+        chart2ValueSlightlyBetter: "17% (5 người)",
+        chart2ValueMuchBetter: "76% (22 người)",
+        cursorStrengthsTitle: "Điểm mạnh của Cursor AI:",
+        cursorStrength1: "<strong>Gợi ý Chính xác & Sát ngữ cảnh:</strong> Hiểu rõ hơn về codebase.",
+        cursorStrength2: "<strong>Tốc độ Phản hồi Nhanh:</strong> Không làm gián đoạn luồng công việc.",
+        cursorStrength3: "<strong>Linh hoạt Lựa chọn Model AI:</strong> Cho phép chọn GPT-4, Claude Sonnet, v.v.",
+        cursorStrength4: "<strong>Tích hợp workflow mượt mà:</strong> Có nhiều tính năng nâng cao.",
+        section4bTitle: "B. Gemini Code Assist vs. Copilot IDE",
+        section4bDesc: "Trong số 12 người đã dùng cả hai, Copilot cũng được đánh giá cao hơn Gemini.",
+        chart3Title: "Biểu đồ 3: Đánh giá Copilot IDE so với Gemini Code Assist",
+        chart3ValueWorse: "8% (1 người)",
+        chart3ValueEqual: "17% (2 người)",
+        chart3ValueSlightlyBetter: "42% (5 người)",
+        chart3ValueMuchBetter: "33% (4 người)",
+        copilotStrengthsTitle: "Điểm mạnh của Copilot:",
+        copilotStrength1: "Gợi ý tin cậy và tốc độ phản hồi nhanh.",
+        copilotStrength2: "Tích hợp và ổn định với các IDE của JetBrains (IntelliJ, WebStorm)."
+    },
+    ja: {
+        pageTitle: "AI IDEツール利用効果分析レポート",
+        mainTitle: "AI IDEツール利用効果分析レポート",
+        section1Title: "1. 調査の背景",
+        section1Desc: "本レポートは、2025年9月末に当社開発者<span class='highlight'>46名</span>を対象に実施したアンケート調査を基に作成されました。回答者の<span class='highlight'>83%（39名）が5年以上の経験を持つ</span>エンジニアであり、主にバックエンドおよびフロントエンド開発に従事しています。",
+        section2Title: "2. 主な調査結果の要約",
+        summaryPara1: "データ分析の結果、<strong class='text-danger'>Gemini Code AssistはDr.JOY開発チームの期待および業務要件を満たしていない</strong>ことが明らかになりました。",
+        summaryPara2: "回答者の<strong>80%以上</strong>が「普通」または「悪い」と評価しており、その主な理由は「応答速度の遅さ」「コード提案の信頼性の低さ」「ユーザーエクスペリエンスの悪さ」に集約されます。",
+        summaryPara3: "一方、<strong class='text-success'>Cursor AI Editorは、93%のユーザーがGemini Code Assistより遥かに優れている</strong>と回答しています。",
+        summaryPara4: "<strong>提言：</strong>来年3月のGemini Code Assistの契約更新を見送り、リソースをCursor AIなど、より効果的なツールの試験導入に振り分けることを検討すべきです。",
+        section3Title: "3. Gemini Code Assist 詳細分析",
+        section3aTitle: "A. 全体評価：極めて低い満足度",
+        section3aDesc: "評価を行った46名のうち、Gemini Code Assistが「良い」と回答したのはわずか<strong>19%</strong>に留まりました。対照的に、<strong>81%</strong>が「普通」または「悪い」と評価しています。",
+        chart1Title: "グラフ1：Gemini Code Assist 全体的な品質評価",
+        chart1LabelBad: "悪い (1-2点)",
+        chart1ValueBad: "19% (6名)",
+        chart1LabelAvg: "普通 (3点)",
+        chart1ValueAvg: "62.5% (20名)",
+        chart1LabelGood: "良い (4-5点)",
+        chart1ValueGood: "19% (6名)",
+        section3bTitle: "B. 核心的な問題点",
+        problem1Title: "問題点1：応答速度が非常に遅い (最大の障害)",
+        problem1Desc: "これは最も多く寄せられた不満点です。<blockquote>「応答速度が遅い」</blockquote><blockquote>「長時間ロードした後、応答がなくストレスを感じる」</blockquote>といった意見が繰り返し見られました。",
+        problem2Title: "問題点2：提案の品質が低く、信頼性に欠ける",
+        problem2Desc: "多くの開発者が、提案されるコードのロジックが誤っている、または文脈に合っていないと報告しています。大規模なコードベースへの理解が浅く、実用的でない提案を生成する傾向があります。<blockquote>「提案が不正確／ロジックが間違っている」</blockquote><blockquote>「リポジトリ全体や複数ファイルにまたがる作業能力に制限がある」</blockquote>",
+        problem3Title: "問題点3：統合性の低さと劣悪なUX（ユーザーエクスペリエンス）",
+        problem3Desc: "多くのユーザーが、既存の開発ワークフローへの統合に困難を感じています。また、<blockquote>「テキストの表示が途切れる問題」</blockquote><blockquote>「回答が長文で、操作性が悪い」</blockquote>といったUI上の問題も、利用体験を損なう要因となっています。",
+        section4Title: "4. Cursor AIおよびCopilotとの直接比較",
+        section4aTitle: "A. Gemini Code Assist vs. Cursor AI",
+        section4aDesc: "両ツールを使用した経験のある29名の回答によると、<strong>Cursor AIが圧倒的に優位である</strong>という結果になりました。",
+        chart2Title: "グラフ2：Cursor AIとGemini Code Assistの比較評価",
+        chartLabelEqual: "同程度",
+        chartLabelSlightlyBetter: "やや良い",
+        chartLabelMuchBetter: "大幅に良い",
+        chartLabelWorse: "劣る",
+        chart2ValueEqual: "7% (2名)",
+        chart2ValueSlightlyBetter: "17% (5名)",
+        chart2ValueMuchBetter: "76% (22名)",
+        cursorStrengthsTitle: "Cursor AIの強み：",
+        cursorStrength1: "<strong>高精度かつ文脈に即した提案：</strong>コードベースへの深い理解力。",
+        cursorStrength2: "<strong>高速な応答速度：</strong>開発フローを中断させない。",
+        cursorStrength3: "<strong>AIモデルの柔軟な選択：</strong>GPT-4やClaude Sonnet等をタスクに応じて切り替え可能。",
+        cursorStrength4: "<strong>スムーズなワークフロー統合：</strong>高度な機能を搭載。",
+        section4bTitle: "B. Gemini Code Assist vs. Copilot IDE",
+        section4bDesc: "両ツールを使用した12名のうち、CopilotもGeminiより高く評価されています。",
+        chart3Title: "グラフ3：Copilot IDEとGemini Code Assistの比較評価",
+        chart3ValueWorse: "8% (1名)",
+        chart3ValueEqual: "17% (2名)",
+        chart3ValueSlightlyBetter: "42% (5名)",
+        chart3ValueMuchBetter: "33% (4名)",
+        copilotStrengthsTitle: "Copilotの強み：",
+        copilotStrength1: "信頼性の高い提案と高速な応答。",
+        copilotStrength2: "JetBrains製IDE（IntelliJ, WebStorm）との安定した統合。"
+    }
+};
+
+function setLanguage(lang) {
+    document.documentElement.lang = lang;
+    
+    // Update all elements with a data-lang-key attribute
+    document.querySelectorAll('[data-lang-key]').forEach(element => {
+        const key = element.getAttribute('data-lang-key');
+        if (translations[lang] && translations[lang][key]) {
+            element.innerHTML = translations[lang][key];
+        }
+    });
+
+    // Update active button state
+    document.querySelector('.lang-switcher button.active').classList.remove('active');
+    document.querySelector(`#lang-${lang}`).classList.add('active');
+}
+
+// Set default language on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setLanguage('vi');
+});
+</script>
+
+</body>
+</html>
