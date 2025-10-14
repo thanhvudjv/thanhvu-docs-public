@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提案：Cursor IDEへの移行 | Đề xuất: Chuyển đổi sang Cursor IDE</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f8f9fa;
+            --text-color: #343a40;
+            --heading-color: #1a202c;
+            --border-color: #dee2e6;
+            --card-bg: #ffffff;
+            --timeline-phase1: #63b3ed;
+            --timeline-phase2: #68d391;
+            --timeline-phase3: #f6ad55;
+        }
+
+        html {
+            font-size: 15px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body.lang-vi {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        body.lang-ja {
+            font-family: 'Hiragino Sans', 'ヒラギノ角ゴ Pro W3', 'Meiryo', 'メイリオ', 'Osaka', 'MS PGothic', sans-serif;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 25px auto;
+            padding: 30px 35px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e9ecef;
+        }
+
+        .lang-switcher {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .lang-switcher button {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 7px 15px;
+            margin-left: 8px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .lang-switcher button:hover, .lang-switcher button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        h1, h2, h3 {
+            color: var(--heading-color);
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 7px;
+            margin-top: 1.6em; 
+            margin-bottom: 0.8em;
+        }
+
+        h1 { text-align: center; font-size: 2rem; border-bottom-width: 3px; margin-top: 0; }
+        h2 { font-size: 1.6rem; }
+        h3 { font-size: 1.25rem; border-bottom: 1px dashed var(--border-color); }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul { list-style-type: none; padding-left: 0; }
+        li { margin-bottom: 9px; padding-left: 22px; position: relative; } 
+        
+        li::before {
+            content: '•';
+            color: var(--primary-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.1em;
+        }
+
+        ul ul { margin-top: 8px; margin-left: 18px; }
+        ul ul li::before { content: '◦'; color: #555; }
+        /* Style for square bullets like in the image */
+        ul ul.square-bullets li::before { content: '▪'; font-size: 0.9em; top: 2px; }
+
+        strong { color: var(--heading-color); }
+
+        .timeline-wrapper {
+            margin-top: 25px;
+        }
+        .timeline-list {
+            position: relative;
+            padding: 15px 0 5px 20px;
+            border-left: 3px solid var(--border-color);
+        }
+        .timeline-item {
+            padding-left: 25px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -31.5px;
+            top: 4px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: white;
+            border: 4px solid var(--border-color);
+            z-index: 1;
+        }
+        .timeline-item.phase-1::before { border-color: var(--timeline-phase1); }
+        .timeline-item.phase-2::before { border-color: var(--timeline-phase2); }
+        .timeline-item.phase-3::before { border-color: var(--timeline-phase3); }
+        .timeline-item > strong { display: block; font-size: 1.1rem; margin-bottom: 4px; }
+        .timeline-item.phase-1 > strong { color: var(--timeline-phase1); }
+        .timeline-item.phase-2 > strong { color: var(--timeline-phase2); }
+        .timeline-item.phase-3 > strong { color: var(--timeline-phase3); }
+        
+        .timeline-item li { font-size: 0.9rem; }
+        .timeline-item ul { margin-bottom: 0; }
+    </style>
+</head>
+<body class="lang-ja">
+
+    <div class="container">
+        <div class="lang-switcher">
+            <button id="lang-ja-btn">日本語</button>
+            <button id="lang-vi-btn">Tiếng Việt</button>
+        </div>
+
+        <header>
+            <h1 lang="vi">ĐỀ XUẤT: CHUYỂN ĐỔI SANG CURSOR IDE</h1>
+            <h1 lang="ja">提案：CURSOR IDEへの移行</h1>
+        </header>
+
+        <main>
+            <!-- SECTION 1 -->
+            <section>
+                <h2 lang="vi">1. BỐI CẢNH VÀ VẤN ĐỀ HIỆN TẠI VỚI GEMINI CODE ASSIST</h2>
+                <h2 lang="ja">1. GEMINI CODE ASSISTの現状と課題</h2>
+                <p lang="vi">Việc triển khai Gemini Code Assist tại Dr.JOY thời gian qua cho thấy hiệu quả chưa đạt kỳ vọng. Dưới đây là các vấn đề chính:</p>
+                <p lang="ja">Dr.JOYにおけるGemini Code Assistの導入は、期待された効果を十分に発揮できていません。以下が主な課題です。</p>
+                <ul>
+                    <li><strong lang="vi">Sử dụng hạn chế:</strong><strong lang="ja">限定的な使用状況:</strong><span lang="vi"> Theo log nội bộ, lập trình viên chủ yếu dùng tính năng CompleteCode; các chức năng sinh mã (GenerateCode) gần như không được khai thác.</span><span lang="ja"> 内部ログによると、開発者は主にCompleteCode機能を利用しており、コード生成機能（GenerateCode）はほとんど活用されていません。</span></li>
+                    <li><strong lang="vi">Khó hiểu ngữ cảnh dự án:</strong><strong lang="ja">プロジェクトコンテキストの理解不足:</strong><span lang="vi"> Với hệ thống quy mô lớn và kiến trúc microservices phức tạp, Gemini gặp hạn chế trong việc nắm bắt toàn bộ context. Dù đã thử bản Enterprise có Code Customization, kết quả cải thiện chưa đáng kể.</span><span lang="ja"> 大規模で複雑なマイクロサービスアーキテクチャを持つシステムにおいて、Geminiは全体のコンテキストを把握する上で限界があります。Code Customizationを備えたEnterprise版を試しましたが、結果は大きく改善されませんでした。</span></li>
+                    <li><strong lang="vi">Chất lượng mã chưa đảm bảo:</strong><strong lang="ja">コード品質の不安定さ:</strong><span lang="vi"> Mã được sinh ra đôi khi sai logic, không tuân thủ quy tắc kiến trúc và coding convention, khiến lập trình viên phải tốn nhiều thời gian rà soát và chỉnh sửa, làm giảm năng suất và tạo tâm lý e ngại khi sử dụng công cụ.</span><span lang="ja"> 生成されたコードにロジックの誤りや、アーキテクチャルール、コーディング規約への違反が時折見られます。これにより、開発者はレビューと修正に多くの時間を費やす必要があり、生産性の低下やツール使用への抵抗感を生んでいます。</span></li>
+                    <li><strong lang="vi">Trải nghiệm người dùng còn yếu:</strong><strong lang="ja">不十分なユーザーエクスペリエンス:</strong><ul><li><span lang="vi">Extension trên VS Code/IntelliJ cập nhật chậm; <strong>Agent Mode</strong> đến Q3/2025 vẫn chỉ ở giai đoạn thử nghiệm.</span><span lang="ja">VS Code/IntelliJ拡張機能の更新が遅い。<strong>Agent Mode</strong>は2025年第3四半期時点でもまだ実験段階です。</span></li><li><span lang="vi">Tính năng ‘Apply Changes' chỉ mới được bổ sung; trước đó việc áp dụng thay đổi phải làm thủ công (copy-paste).</span><span lang="ja">「Apply Changes」機能は最近追加されたばかりで、それ以前は変更の適用を手動（コピー＆ペースト）で行う必要がありました。</span></li><li><span lang="vi">Không hỗ trợ kéo–thả file hoặc hình ảnh vào chat, khiến việc bổ sung ngữ cảnh trở nên khó khăn.</span><span lang="ja">チャットへのファイルや画像のドラッグ＆ドロップをサポートしていないため、コンテキストの追加が困難です。</span></li></ul></li>
+                    <li><strong lang="vi">Phụ thuộc vào mô hình Google:</strong><strong lang="ja">Googleモデルへの依存:</strong><span lang="vi"> Gemini Code Assist chỉ hỗ trợ các model Gemini (1.5, 2.0, 2.5 Pro), nên không thể tận dụng các mô hình mạnh hơn như Claude (Opus, Sonnet) hay GPT (OpenAI) – vốn được đánh giá cao cho tác vụ lập trình.</span><span lang="ja"> Gemini Code AssistはGeminiモデル（1.5, 2.0, 2.5 Pro）のみをサポートしており、プログラミングタスクで高く評価されているClaude（Opus, Sonnet）やGPT（OpenAI）などのより強力なモデルを活用できません。</span></li>
+                    <li><strong lang="vi">Tốc độ phản hồi chậm:</strong><strong lang="ja">応答速度の遅さ:</strong><span lang="vi"> Kết quả khảo sát nội bộ tại Dr.JOY (xem chi tiết tại <a href="https://docs.google.com/forms/d/1BecPUauX3wc53EZDFg3QQ8VnCt7yCOjqBkzrwW-1BAI/edit" target="_blank" rel="noopener noreferrer">đây</a>) và phản hồi từ cộng đồng lập trình viên (tham khảo tại <a href="https://www.reddit.com/r/ChatGPTCoding/comments/1le26hh/what_do_people_think_of_gemini_code_assist/" target="_blank" rel="noopener noreferrer">đây</a>) cho thấy Gemini thường đưa ra gợi ý chậm và thiếu mượt mà trong quá trình làm việc, ảnh hưởng đến trải nghiệm người dùng.</span><span lang="ja"> Dr.JOYでの社内アンケート結果（詳細は<a href="https://docs.google.com/forms/d/1BecPUauX3wc53EZDFg3QQ8VnCt7yCOjqBkzrwW-1BAI/edit" target="_blank" rel="noopener noreferrer">こちら</a>）および開発者コミュニティからのフィードバック（<a href="https://www.reddit.com/r/ChatGPTCoding/comments/1le26hh/what_do_people_think_of_gemini_code_assist/" target="_blank" rel="noopener noreferrer">参照</a>）によると、Geminiは作業中に提案を返すのが遅く、スムーズさに欠けることが多く、ユーザーエクスペリエンスに影響を与えています。</span></li>
+                    <li><strong lang="vi">Review Pull Request kém hiệu quả:</strong><strong lang="ja">非効率なプルリクエストレビュー:</strong><span lang="vi"> Tóm tắt PR dài, thông tin dư thừa, ngôn ngữ lẫn lộn (Anh/Nhật) và thường bị giới hạn bởi quota hằng ngày.</span><span lang="ja"> PRの要約が長く、冗長な情報が含まれ、言語が混在（日英）することがあります。また、日々のクォータ制限に頻繁に達します。</span></li>
+                </ul>
+            </section>
+
+            <!-- SECTION 2 -->
+            <section>
+                <h2 lang="vi">2. GIẢI PHÁP: CHUYỂN SANG CURSOR IDE</h2>
+                <h2 lang="ja">2. 解決策：CURSOR IDEへの移行</h2>
+                <h3 lang="vi">2.1. Ưu điểm nổi bật của Cursor</h3>
+                <h3 lang="ja">2.1. Cursorの主な利点</h3>
+                <ul>
+                    <li><strong lang="vi">Linh hoạt chọn mô hình AI:</strong><strong lang="ja">柔軟なAIモデル選択:</strong><span lang="vi"> Cursor cho phép sử dụng linh hoạt giữa các model hàng đầu như Claude 3.5 Sonnet, Claude 3 Opus, GPT-4o và Gemini 2.5 Pro. Đội ngũ có thể chọn mô hình phù hợp nhất cho từng tác vụ cụ thể.</span><span lang="ja"> Cursorは、Claude 3.5 Sonnet, Claude 3 Opus, GPT-4o, Gemini 2.5 Proといった主要なモデルを柔軟に切り替えて使用できます。チームは特定のタスクに最適なモデルを選択できます。</span></li>
+                    <li><strong lang="vi">Tích hợp mượt mà:</strong><strong lang="ja">シームレスな統合:</strong><span lang="vi"> Cursor không chỉ là extension mà là bản “fork” tùy chỉnh sâu của VS Code, giúp chat, chỉnh sửa, debug và sinh mã diễn ra tự nhiên, thống nhất và phản hồi nhanh hơn.</span><span lang="ja"> Cursorは単なる拡張機能ではなく、VS Codeを深くカスタマイズした「フォーク」版です。これにより、チャット、編集、デバッグ、コード生成がより自然で統一感のある、高速な体験となります。</span></li>
+                    <li><strong lang="vi">Hiểu ngữ cảnh tốt hơn:</strong><strong lang="ja">優れたコンテキスト理解:</strong><span lang="vi"> Cursor hỗ trợ embedding tài liệu và source code trực tiếp vào context của AI, giúp đề xuất chính xác hơn, phù hợp với kiến trúc và logic dự án.</span><span lang="ja"> Cursorはドキュメントとソースコードを直接AIのコンテキストに埋め込む（embedding）ことをサポートしており、プロジェクトのアーキテクチャとロジックに適合した、より正確な提案を可能にします。</span></li>
+                    <li><strong lang="vi">Tăng năng suất và trải nghiệm:</strong><strong lang="ja">生産性と体験の向上:</strong><span lang="vi"> Các thao tác liền mạch, hỗ trợ kéo-thả, chat thông minh và lưu ngữ cảnh giúp lập trình viên tương tác với AI hiệu quả hơn.</span><span lang="ja"> シームレスな操作、ドラッグ＆ドロップのサポート、スマートチャット、コンテキスト保存機能により、開発者はAIとより効果的に対話できます。</span></li>
+                </ul>
+            </section>
+            
+            <!-- SECTION 3 - UPDATED CONTENT -->
+            <section>
+                <h2 lang="vi">3. KẾ HOẠCH TRIỂN KHAI (DỰ KIẾN)</h2>
+                <h2 lang="ja">3. 導入計画（予定）</h2>
+
+                <div class="timeline-wrapper">
+                    <ul class="timeline-list">
+                        <li class="timeline-item phase-1">
+                            <strong lang="vi">Giai đoạn 1: Kiểm chứng & Xây dựng nền tảng (<time>11/2025 – 12/2025</time>)</strong>
+                            <strong lang="ja">フェーズ1：検証と基盤構築 (<time>2025年11月 – 2025年12月</time>)</strong>
+                            <ul>
+                                <li>
+                                    <strong lang="vi">Mục tiêu:</strong><strong lang="ja">目標:</strong>
+                                    <span lang="vi"> Thiết lập nền tảng tri thức, quy trình và môi trường sử dụng Cursor chuẩn cho toàn đội ngũ.</span>
+                                    <span lang="ja"> 全チーム向けの標準的なCursor使用環境、プロセス、ナレッジベースを確立する。</span>
+                                </li>
+                                <li>
+                                    <strong lang="vi">Hành động:</strong><strong lang="ja">アクション:</strong>
+                                    <ul>
+                                        <li><span lang="vi">Thành lập <strong>Pilot Team</strong> (3–4 thành viên có chuyên môn cao và tinh thần cởi mở với công nghệ mới).</span><span lang="ja"><strong>パイロットチーム</strong>（高度な専門知識と新しい技術にオープンな精神を持つ3〜4名のメンバー）を結成する。</span></li>
+                                        <li>
+                                            <span lang="vi">Đăng ký gói <strong>Cursor Team Plan</strong>, cấp quyền sử dụng và cấu hình:</span>
+                                            <span lang="ja"><strong>Cursorチームプラン</strong>に登録し、使用権限を付与して設定を行う:</span>
+                                            <ul class="square-bullets">
+                                                <li><span lang="vi">Thiết lập tài khoản nhóm (Team Workspace), cấp quyền truy cập và gán vai trò quản trị.</span><span lang="ja">チームアカウント（Team Workspace）を設定し、アクセス権を付与して管理者ロールを割り当てる。</span></li>
+                                                <li><span lang="vi">Kích hoạt Privacy Mode để đảm bảo dữ liệu dự án không được gửi ra ngoài hệ thống.</span><span lang="ja">プライバシーモードを有効にし、プロジェクトデータが外部に送信されないようにする。</span></li>
+                                                <li><span lang="vi">Thiết lập Cursor Rules & Memories.</span><span lang="ja">CursorのRules & Memoriesを設定する。</span></li>
+                                            </ul>
+                                        </li>
+                                        <li><span lang="vi">Xây dựng tài liệu nền tảng cho AI: Service Context, Coding Guidelines, Coding Convention, Workflow.</span><span lang="ja">AI用の基盤ドキュメントを作成する: Service Context, Coding Guidelines, Coding Convention, Workflow。</span></li>
+                                        <li><span lang="vi">Thiết lập bộ chỉ số đánh giá (Metrics): bug rate, năng suất, mức độ hài lòng của dev.</span><span lang="ja">評価指標（Metrics）を設定する: バグ率、生産性、開発者の満足度。</span></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="timeline-item phase-2">
+                            <strong lang="vi">Giai đoạn 2: Triển khai & Đào tạo (<time>01/2026 – 02/2026</time>)</strong>
+                            <strong lang="ja">フェーズ2：展開とトレーニング (<time>2026年1月 – 2026年2月</time>)</strong>
+                            <ul>
+                                <li><strong lang="vi">Mục tiêu:</strong><strong lang="ja">目標:</strong><span lang="vi"> Áp dụng rộng rãi và chuẩn hóa quy trình sử dụng AI.</span><span lang="ja"> AI利用プロセスを広範囲に適用し、標準化する。</span></li>
+                                <li><strong lang="vi">Hành động:</strong><strong lang="ja">アクション:</strong><ul>
+                                    <li><span lang="vi">Mở rộng cấp phép Cursor cho toàn bộ đội ngũ phát triển.</span><span lang="ja">開発チーム全体にCursorのライセンスを拡大する。</span></li>
+                                    <li><span lang="vi">Tổ chức chuỗi đào tạo nội bộ, hướng dẫn cách cộng tác chủ động với AI.</span><span lang="ja">一連の内部トレーニングを実施し、AIと能動的に協働する方法を指導する。</span></li>
+                                    <li><span lang="vi">Chia sẻ kinh nghiệm và best practices từ Pilot Team.</span><span lang="ja">パイロットチームからの経験とベストプラクティスを共有する。</span></li>
+                                </ul></li>
+                            </ul>
+                        </li>
+                        <li class="timeline-item phase-3">
+                            <strong lang="vi">Giai đoạn 3: Đánh giá & Cải tiến (<time>03/2026 – 10/2026</time>)</strong>
+                            <strong lang="ja">フェーズ3：評価と改善 (<time>2026年3月 – 2026年10月</time>)</strong>
+                            <ul>
+                                <li><strong lang="vi">Mục tiêu:</strong><strong lang="ja">目標:</strong><span lang="vi"> Đánh giá toàn diện hiệu quả và tối ưu hóa quy trình.</span><span lang="ja"> 効果を包括的に評価し、プロセスを最適化する。</span></li>
+                                <li><strong lang="vi">Hành động:</strong><strong lang="ja">アクション:</strong><ul>
+                                    <li><span lang="vi">Phân tích dữ liệu hiệu suất và phản hồi định kỳ theo từng release.</span><span lang="ja">リリースごとにパフォーマンスデータとフィードバックを定期的に分析する。</span></li>
+                                    <li><span lang="vi">Cập nhật tài liệu, context và workflow dựa trên thực tế sử dụng.</span><span lang="ja">実際の使用状況に基づいてドキュメント、コンテキスト、ワークフローを更新する。</span></li>
+                                    <li><span lang="vi">Tổ chức workshop chuyên sâu, cập nhật tính năng mới của Cursor và các model AI.</span><span lang="ja">CursorとAIモデルの新機能に関する専門的なワークショップを開催し、情報を更新する。</span></li>
+                                    <li><span lang="vi">Phát triển kỹ năng prompt engineering nâng cao và chia sẻ các success case trong nội bộ.</span><span lang="ja">高度なプロンプトエンジニアリングのスキルを育成し、成功事例を内部で共有する。</span></li>
+                                </ul></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- SECTION 4 -->
+            <section>
+                <h2 lang="vi">4. KỲ VỌNG SAU TRIỂN KHAI</h2>
+                <h2 lang="ja">4. 導入後の期待効果</h2>
+                <ul>
+                    <li><span lang="vi"><strong>Giảm thời gian review & sửa lỗi</strong>, tăng chất lượng source code.</span><span lang="ja"><strong>レビューとバグ修正時間の短縮</strong>、ソースコードの品質向上。</span></li>
+                    <li><span lang="vi"><strong>Chuẩn hóa quy trình phát triển</strong> và cách cộng tác giữa lập trình viên và AI.</span><span lang="ja">開発者とAI間の<strong>開発プロセスと協業方法の標準化</strong>。</span></li>
+                    <li><span lang="vi"><strong>Tăng mức độ hài lòng và chủ động</strong> của lập trình viên.</span><span lang="ja">開発者の<strong>満足度と主体性の向上</strong>。</span></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const jaBtn = document.getElementById('lang-ja-btn');
+            const viBtn = document.getElementById('lang-vi-btn');
+            const langElements = document.querySelectorAll('.container [lang]');
+
+            function switchLanguage(targetLang) {
+                document.body.className = `lang-${targetLang}`;
+                
+                langElements.forEach(el => {
+                    if (el.getAttribute('lang') === targetLang) {
+                        const displayStyle = (el.tagName === 'STRONG' || el.tagName === 'SPAN' || el.tagName === 'TIME') ? 'inline' : 'block';
+                        el.style.display = displayStyle;
+                    } else {
+                        el.style.display = 'none';
+                    }
+                });
+
+                document.documentElement.lang = targetLang;
+
+                if (targetLang === 'ja') {
+                    jaBtn.classList.add('active');
+                    viBtn.classList.remove('active');
+                } else {
+                    viBtn.classList.add('active');
+                    jaBtn.classList.remove('active');
+                }
+            }
+
+            jaBtn.addEventListener('click', () => switchLanguage('ja'));
+            viBtn.addEventListener('click', () => switchLanguage('vi'));
+
+            switchLanguage('ja');
+        });
+    </script>
+
+</body>
+</html>
