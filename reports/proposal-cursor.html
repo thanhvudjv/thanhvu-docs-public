@@ -15,6 +15,7 @@
             --timeline-phase1: #63b3ed;
             --timeline-phase2: #68d391;
             --timeline-phase3: #f6ad55;
+            --chart-bar-color: #8b80f9;
         }
 
         html {
@@ -113,10 +114,19 @@
 
         ul ul { margin-top: 8px; margin-left: 18px; }
         ul ul li::before { content: '◦'; color: #555; }
-        /* Style for square bullets like in the image */
         ul ul.square-bullets li::before { content: '▪'; font-size: 0.9em; top: 2px; }
 
         strong { color: var(--heading-color); }
+        
+        /* --- NEW: Styling for <code> tag --- */
+        code {
+            background-color: #e9ecef;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.87em;
+            color: #c7254e;
+            font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
 
         .timeline-wrapper {
             margin-top: 25px;
@@ -153,6 +163,53 @@
         
         .timeline-item li { font-size: 0.9rem; }
         .timeline-item ul { margin-bottom: 0; }
+
+        .chart-container {
+            margin: 15px 0 10px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .chart-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .chart-bar-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .chart-label {
+            width: 110px;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            flex-shrink: 0;
+        }
+        .chart-bar-bg {
+            flex-grow: 1;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            height: 20px;
+        }
+        .chart-bar {
+            height: 100%;
+            background-color: var(--chart-bar-color);
+            border-radius: 4px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding-right: 8px;
+            box-sizing: border-box;
+            min-width: 35px;
+        }
     </style>
 </head>
 <body class="lang-ja">
@@ -176,7 +233,32 @@
                 <p lang="vi">Việc triển khai Gemini Code Assist tại Dr.JOY thời gian qua cho thấy hiệu quả chưa đạt kỳ vọng. Dưới đây là các vấn đề chính:</p>
                 <p lang="ja">Dr.JOYにおけるGemini Code Assistの導入は、期待された効果を十分に発揮できていません。以下が主な課題です。</p>
                 <ul>
-                    <li><strong lang="vi">Sử dụng hạn chế:</strong><strong lang="ja">限定的な使用状況:</strong><span lang="vi"> Theo log nội bộ, lập trình viên chủ yếu dùng tính năng CompleteCode; các chức năng sinh mã (GenerateCode) gần như không được khai thác.</span><span lang="ja"> 内部ログによると、開発者は主にCompleteCode機能を利用しており、コード生成機能（GenerateCode）はほとんど活用されていません。</span></li>
+                    <li>
+                        <strong lang="vi">Sử dụng hạn chế:</strong>
+                        <strong lang="ja">限定的な使用状況:</strong>
+                        
+                        <!-- FIXED FORMATTING HERE -->
+                        <span lang="vi"> Thống kê nội bộ (21/08 – 13/10/2025) cho thấy sự chênh lệch rất lớn: <code>CompleteCode</code> được gọi <strong>164,635 lần</strong> trong khi <code>GenerateCode</code> chỉ có <strong>772 lần</strong> – chênh lệch hơn 200 lần. Điều này chứng tỏ chức năng sinh mã thông minh gần như chưa được khai thác.</span>
+                        <span lang="ja"> 社内統計（2025/08/21～10/13）では、<code>CompleteCode</code>の呼び出しが<strong>164,635回</strong>だったのに対し、<code>GenerateCode</code>はわずか<strong>772回</strong>と、200倍以上の著しい差が確認されました。これは、スマートなコード生成機能がほとんど活用されていないことを明確に示しています。</span>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title" lang="vi">Tần suất gọi tính năng (21/08 – 13/10/2025)</div>
+                            <div class="chart-title" lang="ja">メソッド呼び出し頻度 (2025/08/21 – 10/13)</div>
+                            <div class="chart-bar-wrapper">
+                                <div class="chart-label">CompleteCode</div>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar" style="width: 100%;">164,635</div>
+                                </div>
+                            </div>
+                            <div class="chart-bar-wrapper">
+                                <div class="chart-label">GenerateCode</div>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar" style="width: 0.47%;">772</div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
                     <li><strong lang="vi">Khó hiểu ngữ cảnh dự án:</strong><strong lang="ja">プロジェクトコンテキストの理解不足:</strong><span lang="vi"> Với hệ thống quy mô lớn và kiến trúc microservices phức tạp, Gemini gặp hạn chế trong việc nắm bắt toàn bộ context. Dù đã thử bản Enterprise có Code Customization, kết quả cải thiện chưa đáng kể.</span><span lang="ja"> 大規模で複雑なマイクロサービスアーキテクチャを持つシステムにおいて、Geminiは全体のコンテキストを把握する上で限界があります。Code Customizationを備えたEnterprise版を試しましたが、結果は大きく改善されませんでした。</span></li>
                     <li><strong lang="vi">Chất lượng mã chưa đảm bảo:</strong><strong lang="ja">コード品質の不安定さ:</strong><span lang="vi"> Mã được sinh ra đôi khi sai logic, không tuân thủ quy tắc kiến trúc và coding convention, khiến lập trình viên phải tốn nhiều thời gian rà soát và chỉnh sửa, làm giảm năng suất và tạo tâm lý e ngại khi sử dụng công cụ.</span><span lang="ja"> 生成されたコードにロジックの誤りや、アーキテクチャルール、コーディング規約への違反が時折見られます。これにより、開発者はレビューと修正に多くの時間を費やす必要があり、生産性の低下やツール使用への抵抗感を生んでいます。</span></li>
                     <li><strong lang="vi">Trải nghiệm người dùng còn yếu:</strong><strong lang="ja">不十分なユーザーエクスペリエンス:</strong><ul><li><span lang="vi">Extension trên VS Code/IntelliJ cập nhật chậm; <strong>Agent Mode</strong> đến Q3/2025 vẫn chỉ ở giai đoạn thử nghiệm.</span><span lang="ja">VS Code/IntelliJ拡張機能の更新が遅い。<strong>Agent Mode</strong>は2025年第3四半期時点でもまだ実験段階です。</span></li><li><span lang="vi">Tính năng ‘Apply Changes' chỉ mới được bổ sung; trước đó việc áp dụng thay đổi phải làm thủ công (copy-paste).</span><span lang="ja">「Apply Changes」機能は最近追加されたばかりで、それ以前は変更の適用を手動（コピー＆ペースト）で行う必要がありました。</span></li><li><span lang="vi">Không hỗ trợ kéo–thả file hoặc hình ảnh vào chat, khiến việc bổ sung ngữ cảnh trở nên khó khăn.</span><span lang="ja">チャットへのファイルや画像のドラッグ＆ドロップをサポートしていないため、コンテキストの追加が困難です。</span></li></ul></li>
@@ -200,7 +282,7 @@
                 </ul>
             </section>
             
-            <!-- SECTION 3 - UPDATED CONTENT -->
+            <!-- SECTION 3 -->
             <section>
                 <h2 lang="vi">3. KẾ HOẠCH TRIỂN KHAI (DỰ KIẾN)</h2>
                 <h2 lang="ja">3. 導入計画（予定）</h2>
@@ -288,7 +370,7 @@
                 
                 langElements.forEach(el => {
                     if (el.getAttribute('lang') === targetLang) {
-                        const displayStyle = (el.tagName === 'STRONG' || el.tagName === 'SPAN' || el.tagName === 'TIME') ? 'inline' : 'block';
+                        const displayStyle = (el.tagName === 'STRONG' || el.tagName === 'SPAN' || el.tagName === 'TIME' || el.tagName === 'A' || el.tagName === 'CODE') ? 'inline' : 'block';
                         el.style.display = displayStyle;
                     } else {
                         el.style.display = 'none';
