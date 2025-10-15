@@ -118,7 +118,6 @@
 
         strong { color: var(--heading-color); }
         
-        /* --- NEW: Styling for <code> tag --- */
         code {
             background-color: #e9ecef;
             padding: 2px 5px;
@@ -236,14 +235,15 @@
                     <li>
                         <strong lang="vi">Sử dụng hạn chế:</strong>
                         <strong lang="ja">限定的な使用状況:</strong>
-                        
-                        <!-- FIXED FORMATTING HERE -->
                         <span lang="vi"> Thống kê nội bộ (21/08 – 13/10/2025) cho thấy sự chênh lệch rất lớn: <code>CompleteCode</code> được gọi <strong>164,635 lần</strong> trong khi <code>GenerateCode</code> chỉ có <strong>772 lần</strong> – chênh lệch hơn 200 lần. Điều này chứng tỏ chức năng sinh mã thông minh gần như chưa được khai thác.</span>
-                        <span lang="ja"> 社内統計（2025/08/21～10/13）では、<code>CompleteCode</code>の呼び出しが<strong>164,635回</strong>だったのに対し、<code>GenerateCode</code>はわずか<strong>772回</strong>と、200倍以上の著しい差が確認されました。これは、スマートなコード生成機能がほとんど活用されていないことを明確に示しています。</span>
+                        
+                        <!-- FIXED JAPANESE DATE FORMAT HERE -->
+                        <span lang="ja"> 社内統計（2025年8月21日～10月13日）では、<code>CompleteCode</code>の呼び出しが<strong>164,635回</strong>だったのに対し、<code>GenerateCode</code>はわずか<strong>772回</strong>と、200倍以上の著しい差が確認されました。これは、スマートなコード生成機能がほとんど活用されていないことを明確に示しています。</span>
                         
                         <div class="chart-container">
                             <div class="chart-title" lang="vi">Tần suất gọi tính năng (21/08 – 13/10/2025)</div>
-                            <div class="chart-title" lang="ja">メソッド呼び出し頻度 (2025/08/21 – 10/13)</div>
+                            <!-- FIXED JAPANESE DATE FORMAT HERE -->
+                            <div class="chart-title" lang="ja">メソッド呼び出し頻度 (2025年8月21日～10月13日)</div>
                             <div class="chart-bar-wrapper">
                                 <div class="chart-label">CompleteCode</div>
                                 <div class="chart-bar-bg">
