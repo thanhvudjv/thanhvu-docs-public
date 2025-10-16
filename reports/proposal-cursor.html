@@ -126,6 +126,18 @@
             color: #c7254e;
             font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
         }
+        
+        /* --- NEW: Style for the quote block --- */
+        .quote-box {
+            background-color: #f1f3f5;
+            border-left: 4px solid var(--border-color);
+            margin: 10px 0 5px 0;
+            padding: 10px 15px;
+            font-size: 0.85rem;
+            font-style: italic;
+            color: #555;
+            border-radius: 0 4px 4px 0;
+        }
 
         .timeline-wrapper {
             margin-top: 25px;
@@ -236,13 +248,10 @@
                         <strong lang="vi">Sử dụng hạn chế:</strong>
                         <strong lang="ja">限定的な使用状況:</strong>
                         <span lang="vi"> Thống kê nội bộ (21/08 – 13/10/2025) cho thấy sự chênh lệch rất lớn: <code>CompleteCode</code> được gọi <strong>164,635 lần</strong> trong khi <code>GenerateCode</code> chỉ có <strong>772 lần</strong> – chênh lệch hơn 200 lần. Điều này chứng tỏ chức năng sinh mã thông minh gần như chưa được khai thác.</span>
-                        
-                        <!-- FIXED JAPANESE DATE FORMAT HERE -->
                         <span lang="ja"> 社内統計（2025年8月21日～10月13日）では、<code>CompleteCode</code>の呼び出しが<strong>164,635回</strong>だったのに対し、<code>GenerateCode</code>はわずか<strong>772回</strong>と、200倍以上の著しい差が確認されました。これは、スマートなコード生成機能がほとんど活用されていないことを明確に示しています。</span>
                         
                         <div class="chart-container">
                             <div class="chart-title" lang="vi">Tần suất gọi tính năng (21/08 – 13/10/2025)</div>
-                            <!-- FIXED JAPANESE DATE FORMAT HERE -->
                             <div class="chart-title" lang="ja">メソッド呼び出し頻度 (2025年8月21日～10月13日)</div>
                             <div class="chart-bar-wrapper">
                                 <div class="chart-label">CompleteCode</div>
@@ -262,9 +271,17 @@
                     <li><strong lang="vi">Khó hiểu ngữ cảnh dự án:</strong><strong lang="ja">プロジェクトコンテキストの理解不足:</strong><span lang="vi"> Với hệ thống quy mô lớn và kiến trúc microservices phức tạp, Gemini gặp hạn chế trong việc nắm bắt toàn bộ context. Dù đã thử bản Enterprise có Code Customization, kết quả cải thiện chưa đáng kể.</span><span lang="ja"> 大規模で複雑なマイクロサービスアーキテクチャを持つシステムにおいて、Geminiは全体のコンテキストを把握する上で限界があります。Code Customizationを備えたEnterprise版を試しましたが、結果は大きく改善されませんでした。</span></li>
                     <li><strong lang="vi">Chất lượng mã chưa đảm bảo:</strong><strong lang="ja">コード品質の不安定さ:</strong><span lang="vi"> Mã được sinh ra đôi khi sai logic, không tuân thủ quy tắc kiến trúc và coding convention, khiến lập trình viên phải tốn nhiều thời gian rà soát và chỉnh sửa, làm giảm năng suất và tạo tâm lý e ngại khi sử dụng công cụ.</span><span lang="ja"> 生成されたコードにロジックの誤りや、アーキテクチャルール、コーディング規約への違反が時折見られます。これにより、開発者はレビューと修正に多くの時間を費やす必要があり、生産性の低下やツール使用への抵抗感を生んでいます。</span></li>
                     <li><strong lang="vi">Trải nghiệm người dùng còn yếu:</strong><strong lang="ja">不十分なユーザーエクスペリエンス:</strong><ul><li><span lang="vi">Extension trên VS Code/IntelliJ cập nhật chậm; <strong>Agent Mode</strong> đến Q3/2025 vẫn chỉ ở giai đoạn thử nghiệm.</span><span lang="ja">VS Code/IntelliJ拡張機能の更新が遅い。<strong>Agent Mode</strong>は2025年第3四半期時点でもまだ実験段階です。</span></li><li><span lang="vi">Tính năng ‘Apply Changes' chỉ mới được bổ sung; trước đó việc áp dụng thay đổi phải làm thủ công (copy-paste).</span><span lang="ja">「Apply Changes」機能は最近追加されたばかりで、それ以前は変更の適用を手動（コピー＆ペースト）で行う必要がありました。</span></li><li><span lang="vi">Không hỗ trợ kéo–thả file hoặc hình ảnh vào chat, khiến việc bổ sung ngữ cảnh trở nên khó khăn.</span><span lang="ja">チャットへのファイルや画像のドラッグ＆ドロップをサポートしていないため、コンテキストの追加が困難です。</span></li></ul></li>
-                    <li><strong lang="vi">Phụ thuộc vào mô hình Google:</strong><strong lang="ja">Googleモデルへの依存:</strong><span lang="vi"> Gemini Code Assist chỉ hỗ trợ các model Gemini (1.5, 2.0, 2.5 Pro), nên không thể tận dụng các mô hình mạnh hơn như Claude (Opus, Sonnet) hay GPT (OpenAI) – vốn được đánh giá cao cho tác vụ lập trình.</span><span lang="ja"> Gemini Code AssistはGeminiモデル（1.5, 2.0, 2.5 Pro）のみをサポートしており、プログラミングタスクで高く評価されているClaude（Opus, Sonnet）やGPT（OpenAI）などのより強力なモデルを活用できません。</span></li>
+                    <li><strong lang="vi">Phụ thuộc vào mô hình Google:</strong><strong lang="ja">Googleモデルへの依存:</strong><span lang="vi"> Gemini Code Assist chỉ hỗ trợ các model Gemini (1.5, 2.0, 2.5 Pro), nên không thể tận dụng các mô hình mạnh hơn như Claude (Opus, Sonnet) hay GPT (OpenAI) – vốn được đánh giá cao cho tác vụ lập trình.</span><span lang="ja"> Gemini Code AssistはGeminiモデル（1.5, 2.0, 2.5 Pro）のみをサポートしており、プログラミングタスクで高く評価されているClaude（OpUS, Sonnet）やGPT（OpenAI）などのより強力なモデルを活用できません。</span></li>
                     <li><strong lang="vi">Tốc độ phản hồi chậm:</strong><strong lang="ja">応答速度の遅さ:</strong><span lang="vi"> Kết quả khảo sát nội bộ tại Dr.JOY (xem chi tiết tại <a href="https://docs.google.com/forms/d/1BecPUauX3wc53EZDFg3QQ8VnCt7yCOjqBkzrwW-1BAI/edit" target="_blank" rel="noopener noreferrer">đây</a>) và phản hồi từ cộng đồng lập trình viên (tham khảo tại <a href="https://www.reddit.com/r/ChatGPTCoding/comments/1le26hh/what_do_people_think_of_gemini_code_assist/" target="_blank" rel="noopener noreferrer">đây</a>) cho thấy Gemini thường đưa ra gợi ý chậm và thiếu mượt mà trong quá trình làm việc, ảnh hưởng đến trải nghiệm người dùng.</span><span lang="ja"> Dr.JOYでの社内アンケート結果（詳細は<a href="https://docs.google.com/forms/d/1BecPUauX3wc53EZDFg3QQ8VnCt7yCOjqBkzrwW-1BAI/edit" target="_blank" rel="noopener noreferrer">こちら</a>）および開発者コミュニティからのフィードバック（<a href="https://www.reddit.com/r/ChatGPTCoding/comments/1le26hh/what_do_people_think_of_gemini_code_assist/" target="_blank" rel="noopener noreferrer">参照</a>）によると、Geminiは作業中に提案を返すのが遅く、スムーズさに欠けることが多く、ユーザーエクスペリエンスに影響を与えています。</span></li>
-                    <li><strong lang="vi">Review Pull Request kém hiệu quả:</strong><strong lang="ja">非効率なプルリクエストレビュー:</strong><span lang="vi"> Tóm tắt PR dài, thông tin dư thừa, ngôn ngữ lẫn lộn (Anh/Nhật) và thường bị giới hạn bởi quota hằng ngày.</span><span lang="ja"> PRの要約が長く、冗長な情報が含まれ、言語が混在（日英）することがあります。また、日々のクォータ制限に頻繁に達します。</span></li>
+                    
+                    <!-- UPDATED SECTION HERE -->
+                    <li>
+                        <strong lang="vi">Tính năng Review Pull Request chưa hiệu quả:</strong>
+                        <strong lang="ja">非効率なプルリクエストレビュー:</strong>
+                        <span lang="vi">Tính năng tóm tắt và phản hồi trên GitHub PR thường tạo ra nội dung dài, chứa thông tin thừa, ngôn ngữ không nhất quán (Anh/Nhật) và bị giới hạn bởi quota sử dụng hàng ngày.</span>
+                        <span lang="ja">GitHub PRの要約・フィードバック機能は、生成される内容が長く、冗長な情報を含み、言語が不統一（日英混在）になる傾向があります。さらに、頻繁に日々の利用クォータ制限に達します。</span>
+                        <blockquote class="quote-box">“You have reached your daily quota limit. Please wait up to 24 hours and I will start processing your requests again!”</blockquote>
+                    </li>
                 </ul>
             </section>
 
