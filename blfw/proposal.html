@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Baseline Effort & Quality Framework</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #101828;
+      --muted: #475467;
+      --line: #e4e7ec;
+      --accent: #111827;
+      --soft: #eef2f6;
+      --good: #027a48;
+      --warn: #b54708;
+      --bad: #b42318;
+    }
+    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      font-family: Inter, "Noto Sans JP", Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: #dfe5ec;
+      padding-top: 52px;
+    }
+    body.view-vertical {
+      scroll-snap-type: y mandatory;
+      overflow-y: auto;
+    }
+    body.view-vertical .slide {
+      scroll-snap-align: start;
+      scroll-snap-stop: normal;
+    }
+    .deck-toolbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px 20px;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    .deck-toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .deck-toolbar-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-right: 4px;
+    }
+    .deck-btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .deck-btn:hover {
+      background: var(--soft);
+    }
+    .deck-btn[aria-pressed="true"] {
+      background: var(--accent);
+      color: #feb;
+      border-color: var(--accent);
+    }
+    .deck-btn-nav {
+      min-width: 40px;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    .deck-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .deck-slide-status {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      min-width: 5.5em;
+      text-align: center;
+    }
+    .deck-sr-announce {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    body.view-horizontal {
+      overflow: hidden;
+      height: 100vh;
+    }
+    body.view-horizontal .deck {
+      min-height: calc(100vh - 52px);
+      height: calc(100vh - 52px);
+      position: relative;
+      overflow: hidden;
+    }
+    body.view-horizontal .slide {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      margin: 0;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.22s ease-out, transform 0.22s ease-out;
+    }
+    body.view-horizontal .slide.is-active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+    }
+    body.view-horizontal .slide.is-enter-right {
+      transform: translate(calc(-50% + 10px), -50%);
+    }
+    body.view-horizontal .slide.is-enter-left {
+      transform: translate(calc(-50% - 10px), -50%);
+    }
+    body.view-horizontal .slide.is-active.is-enter-right,
+    body.view-horizontal .slide.is-active.is-enter-left {
+      transform: translate(-50%, -50%);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      body.view-horizontal .slide {
+        transition: none;
+      }
+    }
+    .deck {
+      width: 100%;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .slide {
+      width: 1280px;
+      height: 720px;
+      margin: 24px auto;
+      background: var(--card);
+      border-radius: 28px;
+      box-shadow: 0 18px 60px rgba(16,24,40,.12);
+      padding: 54px 64px;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+    }
+    .eyebrow {
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+    h1, h2, h3, p, li { margin: 0; }
+    h1 {
+      font-size: 40px;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      max-width: 900px;
+    }
+    h2 {
+      font-size: 30px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    p.lead {
+      font-size: 19px;
+      line-height: 1.5;
+      color: var(--muted);
+      max-width: 880px;
+      margin-top: 20px;
+    }
+    .meta {
+      position: absolute;
+      bottom: 42px;
+      left: 64px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .page {
+      position: absolute;
+      bottom: 38px;
+      right: 64px;
+      color: #98a2b3;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      margin-top: 22px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 22px;
+    }
+    .card {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+    }
+    .card h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .card p, .card li { font-size: 18px; line-height: 1.45; color: var(--muted); }
+    ul.clean { padding-left: 20px; margin-top: 10px; }
+    ul.clean li { margin: 8px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 17px;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 14px;
+      font-weight: 700;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .hero-box {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+    .big-stat {
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2f6 100%);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .big-stat .kpi {
+      font-size: 74px;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      margin-top: 12px;
+    }
+    .big-stat .caption {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.45;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      background: #fff;
+      min-height: 148px;
+    }
+    .step .num {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .step strong { display: block; font-size: 21px; margin-bottom: 8px; }
+    .step p { color: var(--muted); font-size: 16px; line-height: 1.45; }
+    .matrix {
+      display: grid;
+      grid-template-columns: 170px repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+      font-size: 16px;
+    }
+    .matrix div {
+      border: 1px solid rgba(16,24,40,.08);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .matrix .head { background: #e8edf3; font-weight: 700; }
+    .matrix .side { background: #e8edf3; font-weight: 700; justify-content: flex-start; padding-left: 16px; }
+    .matrix .cell { font-weight: 700; color: #3b2f1a; }
+    .matrix .tone-1 { background: #fbf4e8; }
+    .matrix .tone-2 { background: #f8e7c9; }
+    .matrix .tone-3 { background: #f3d6a9; }
+    .matrix .tone-4 { background: #edc27f; }
+    .matrix .tone-5 { background: #e3a85d; }
+    .note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+    .band {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: var(--accent);
+    }
+    .two-col-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 28px;
+      margin-top: 18px;
+    }
+    .mini {
+      border-left: 3px solid #d0d5dd;
+      padding-left: 14px;
+    }
+    .mini strong { display: block; font-size: 18px; margin-bottom: 6px; }
+    .mini p { color: var(--muted); font-size: 16px; line-height: 1.45; }
+
+    .issue-grid { display:grid; grid-template-columns: repeat(5, 1fr); gap:14px; margin-top:22px; }
+    .issue-tile { background: linear-gradient(180deg,#ffffff 0%,#f7f9fc 100%); border:1px solid var(--line); border-radius:20px; padding:18px 16px; min-height:240px; }
+    .issue-no { width:38px; height:38px; border-radius:999px; background:var(--soft); display:flex; align-items:center; justify-content:center; font-weight:800; margin-bottom:12px; }
+    .issue-tile h3 { font-size:19px; line-height:1.2; margin-bottom:10px; }
+    .issue-tile p { font-size:15px; line-height:1.45; color:var(--muted); }
+    .impact-band { margin-top:18px; display:grid; grid-template-columns: 1.15fr .85fr; gap:18px; }
+    .impact-box { background:#fff; border:1px dashed #d0d5dd; border-radius:18px; padding:16px 18px; }
+    .impact-box strong { font-size:16px; display:block; margin-bottom:6px; }
+    .impact-box p + strong { margin-top:10px; }
+    .impact-box p { color:var(--muted); font-size:15px; line-height:1.45; }
+    .compare-wrap { margin-top:22px; display:grid; grid-template-columns: 1fr 100px 1fr; gap:18px; align-items:stretch; }
+    .compare-card { border:1px solid var(--line); border-radius:22px; padding:22px; background:var(--bg); }
+    .compare-card h3 { font-size:24px; margin-bottom:14px; }
+    .compare-card ul { padding-left:18px; margin:0; }
+    .compare-card li { margin:10px 0; font-size:17px; line-height:1.45; color:var(--muted); }
+    .vs-arrow { display:flex; align-items:center; justify-content:center; font-size:42px; color:#98a2b3; font-weight:800; }
+    .factor-strip { margin-top:18px; display:flex; flex-wrap:wrap; gap:10px; }
+    .factor { padding:10px 14px; border-radius:999px; background:#fff; border:1px solid var(--line); font-size:14px; font-weight:700; color:var(--muted); }
+    .score-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:18px; margin-top:24px; }
+    .score-card { border:1px solid var(--line); border-radius:22px; padding:22px; background:linear-gradient(180deg,#fff 0%,#f8fafc 100%); min-height:235px; }
+    .score-card .tag { display:inline-block; padding:6px 10px; border-radius:999px; background:var(--soft); font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+    .score-card h3 { font-size:24px; margin:14px 0 12px; }
+    .score-card .metric { font-size:20px; line-height:1; letter-spacing:-0.04em; margin-bottom:10px; }
+    .score-card p { font-size:16px; line-height:1.45; color:var(--muted); }
+    .bottom-rule { margin-top:18px; background:#111827; color:#fff; border-radius:20px; padding:18px 22px; font-size:18px; line-height:1.45; }
+
+    @media print {
+      body {
+        background: #fff;
+        padding-top: 0 !important;
+        overflow: visible !important;
+        height: auto !important;
+      }
+      .deck-toolbar {
+        display: none !important;
+      }
+      body.view-horizontal .deck {
+        min-height: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+        position: static !important;
+      }
+      body.view-horizontal .slide {
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        margin: 24px auto !important;
+        transform: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        scroll-snap-align: none !important;
+      }
+      .slide { margin: 0 auto; box-shadow: none; border-radius: 0; }
+    }
+    @media (max-width: 1320px) {
+      .slide { width: calc(100vw - 24px); height: auto; min-height: 720px; }
+    }
+  </style>
+</head>
+<body class="view-vertical">
+  <nav class="deck-toolbar" id="deck-toolbar" aria-label="Điều khiển trình chiếu">
+    <span hidden data-i18n="ui.toolbarAria">Điều khiển trình chiếu</span>
+    <div class="deck-toolbar-group">
+      <span class="deck-toolbar-label" data-i18n="ui.lang">Ngôn ngữ</span>
+      <button type="button" class="deck-btn" id="btn-lang-vi" aria-pressed="true" data-i18n="ui.langVi">Tiếng Việt</button>
+      <button type="button" class="deck-btn" id="btn-lang-ja" aria-pressed="false" data-i18n="ui.langJa">日本語</button>
+    </div>
+    <div class="deck-toolbar-group">
+      <span class="deck-toolbar-label" data-i18n="ui.view">Chế độ xem</span>
+      <button type="button" class="deck-btn" id="btn-view-vertical" aria-pressed="true" data-i18n="ui.viewVertical">Dọc</button>
+      <button type="button" class="deck-btn" id="btn-view-horizontal" aria-pressed="false" data-i18n="ui.viewHorizontal">Slide</button>
+    </div>
+    <div class="deck-toolbar-group deck-horizontal-only" hidden>
+      <button type="button" class="deck-btn deck-btn-nav" id="btn-prev" aria-label="Slide trước" data-i18n-attr="aria-label:ui.prevAria">←</button>
+      <span class="deck-slide-status" id="slide-status" aria-atomic="true"></span>
+      <button type="button" class="deck-btn deck-btn-nav" id="btn-next" aria-label="Slide sau" data-i18n-attr="aria-label:ui.nextAria">→</button>
+    </div>
+  </nav>
+  <span hidden data-i18n="ui.slideLabel">{n} / {t}</span>
+  <div id="sr-announce" class="deck-sr-announce" aria-live="polite" aria-atomic="true"></div>
+  <div class="deck">
+    <section class="slide">
+      <div class="band"></div>
+      <div class="eyebrow" data-i18n="s01.eyebrow">Baseline framework</div>
+      <h1 data-i18n="s01.h1">Đề xuất framework mới để đánh giá effort, chất lượng và hiệu quả quy trình phát triển</h1>
+      <p class="lead" data-i18n="s01.lead">Framework mới chuẩn hóa toàn bộ chuỗi đánh giá: phân loại ticket, thu thập effort, xây dựng baseline, so sánh lệch chuẩn và RCA cải tiến.</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-i18n="s01.c1.h3">Khung thay đổi cốt lõi</h3>
+          <ul class="clean">
+            <li data-i18n="s01.c1.li0">Phân loại ticket theo Complexity + Risk / Uncertainty</li>
+            <li data-i18n="s01.c1.li1">Đo effort theo end-to-end workflow</li>
+            <li data-i18n="s01.c1.li2">Xây dựng baseline theo CxRy và theo dõi rolling trend</li>
+            <li data-i18n="s01.c1.li3">So sánh với baseline để phát hiện warning / abnormal</li>
+            <li data-i18n="s01.c1.li4">Thực hiện RCA để cải thiện process và performance</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 data-i18n="s01.c2.h3">Phạm vi thay đổi</h3>
+          <ul class="clean">
+            <li data-i18n="s01.c2.li0">Data: đổi cách thu thập effort</li>
+            <li data-i18n="s01.c2.li1">Evaluation: đổi cách phân loại ticket</li>
+            <li data-i18n="s01.c2.li2">Baseline: đổi cách xây dựng mức tham chiếu</li>
+            <li data-i18n="s01.c2.li3">Comparison: đổi cách xác định normal / warning / abnormal</li>
+            <li data-i18n="s01.c2.li4">Action: đổi cách review và cải tiến sau đánh giá</li>
+          </ul>
+        </div>
+      </div>
+      <div class="page">01</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s02.eyebrow">Current baseline</div>
+      <h2 data-i18n="s02.h2">Cơ chế xây dựng baseline hiện tại</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-i18n="s02.c1.h3">Cách baseline được xây dựng</h3>
+          <ul class="clean">
+            <li data-i18n="s02.c1.li0">Dữ liệu lịch sử trước khi áp dụng Cursor IDE</li>
+            <li data-i18n="s02.c1.li1">Thời gian thu thập: 08/2025–12/2026.</li>
+            <li data-i18n="s02.c1.li2">Work item gồm 2 nhóm chính: Feature và Bug</li>
+            <li data-i18n="s02.c1.li3">Với mỗi nhóm S, tính P50 Spent Time (Coding+FixBug) và P50 Bug Count</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 data-i18n="s02.c2.h3">Mô hình đánh giá ticket cũ</h3>
+          <table>
+            <thead>
+              <tr><th data-i18n="s02.th0">Yếu tố</th><th data-i18n="s02.th1">Trọng số</th><th data-i18n="s02.th2">Thang điểm</th></tr>
+            </thead>
+            <tbody>
+              <tr><td data-i18n="s02.r0c0">Complexity</td><td>40%</td><td>1–5</td></tr>
+              <tr><td data-i18n="s02.r1c0">Risk / Uncertainty</td><td>35%</td><td>1–5</td></tr>
+              <tr><td data-i18n="s02.r2c0">Effort / Volume</td><td>25%</td><td>1–5</td></tr>
+            </tbody>
+          </table>
+          <p class="note" data-i18n="s02.note">Ticket score = (C × 40%) + (R × 35%) + (E × 25%)</p>
+        </div>
+      </div>
+      <div class="flow">
+        <div class="step"><div class="num" data-i18n="s02.st1.n">Step 1</div><strong data-i18n="s02.st1.t">Dev tự đánh giá CRE</strong><p data-i18n="s02.st1.p">Mỗi developer tự đánh giá ticket theo 3 yếu tố.</p></div>
+        <div class="step"><div class="num" data-i18n="s02.st2.n">Step 2</div><strong data-i18n="s02.st2.t">Tổng hợp theo tỷ lệ effort</strong><p data-i18n="s02.st2.p">Điểm ticket được tổng hợp dựa trên tỷ lệ đóng góp của từng người.</p></div>
+        <div class="step"><div class="num" data-i18n="s02.st3.n">Step 3</div><strong data-i18n="s02.st3.t">Map theo range score cố định</strong><p data-i18n="s02.st3.p">Score tổng được phân vào S1–S5 theo các khoảng 0–20, 20–40, 40–60, 60–80, 80–100.</p></div>
+        <div class="step"><div class="num" data-i18n="s02.st4.n">Step 4</div><strong data-i18n="s02.st4.t">Tính baseline theo từng nhóm S</strong><p data-i18n="s02.st4.p">Lấy P50 cho Spent Time và Bug Count của từng nhóm.</p></div>
+      </div>
+      <div class="page">02</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s03.eyebrow">Pain points</div>
+      <h2 data-i18n="s03.h2">5 điểm khiến baseline cũ khó làm căn cứ đánh giá hiệu quả</h2>
+      <div class="issue-grid">
+        <div class="issue-tile"><div class="issue-no">1</div><h3 data-i18n="s03.i1.h">Chủ quan</h3><p data-i18n="s03.i1.p">CRE phụ thuộc đánh giá cá nhân developer; khi tổng hợp theo % effort có thể không phản ánh đúng phần việc khó.</p></div>
+        <div class="issue-tile"><div class="issue-no">2</div><h3 data-i18n="s03.i2.h">Thiếu validation</h3><p data-i18n="s03.i2.p">Trọng số CRE chưa được kiểm chứng là phản ánh đúng độ khó thực tế.</p></div>
+        <div class="issue-tile"><div class="issue-no">3</div><h3 data-i18n="s03.i3.h">Grouping cứng</h3><p data-i18n="s03.i3.p">S1–S5 chia theo range cố định, dễ dồn ticket vào ít nhóm và làm median kém đại diện.</p></div>
+        <div class="issue-tile"><div class="issue-no">4</div><h3 data-i18n="s03.i4.h">Metric hẹp</h3><p data-i18n="s03.i4.p">Chỉ nhìn Coding + Fix bug, chưa phản ánh effort end-to-end của ticket.</p></div>
+        <div class="issue-tile"><div class="issue-no">5</div><h3 data-i18n="s03.i5.h">Không theo trend</h3><p data-i18n="s03.i5.p">Baseline tĩnh không hỗ trợ theo dõi improvement liên tục theo thời gian.</p></div>
+      </div>
+      <div class="impact-band">
+        <div class="impact-box"><strong data-i18n="s03.ib1.t">Vì sao đây là vấn đề</strong><p data-i18n="s03.ib1.p">Khi baseline chưa đủ tin cậy, việc so sánh effort giữa các ticket sẽ thiếu công bằng, khó phát hiện bất thường và chưa đủ cơ sở để đánh giá khách quan tác động của process, workflow và Cursor IDE.</p></div>
+        <div class="impact-box"><strong data-i18n="s03.ib2.t">Hướng chuyển đổi</strong><p data-i18n="s03.ib2.p">Chuyển sang baseline động: phân loại theo Complexity + Risk, đo effort end-to-end và theo dõi theo 4 chiều Productivity, Quality, Stability, Performance.</p></div>
+      </div>
+      <div class="page">03</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s04.eyebrow">New model</div>
+      <h2 data-i18n="s04.h2">Hướng cải tiến: phân loại ticket theo bản chất công việc để so sánh đúng baseline</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-i18n="s04.c1.h3">Nguyên tắc thiết kế</h3>
+          <ul class="clean">
+            <li data-i18n="s04.c1.li0">Dùng Complexity và Risk / Uncertainty để phân loại ticket.</li>
+            <li data-i18n="s04.c1.li1">Không dùng effort làm đầu vào phân loại.</li>
+            <li data-i18n="s04.c1.li2">Chỉ so sánh ticket với baseline của đúng nhóm CxRy.</li>
+            <li data-i18n="s04.c1.li3">Cập nhật baseline định kỳ để theo dõi xu hướng.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 data-i18n="s04.c2.h3">2 yếu tố đầu vào</h3>
+          <table>
+            <thead><tr><th data-i18n="s04.th0">Yếu tố</th><th data-i18n="s04.th1">Mô tả</th><th data-i18n="s04.th2">Thang điểm</th></tr></thead>
+            <tbody>
+              <tr><td data-i18n="s04.r0c0">Complexity</td><td data-i18n="s04.r0c1">Độ phức tạp kỹ thuật / hệ thống</td><td>1–5</td></tr>
+              <tr><td data-i18n="s04.r1c0">Risk / Uncertainty</td><td data-i18n="s04.r1c1">Mức độ không chắc chắn / phụ thuộc</td><td>1–5</td></tr>
+            </tbody>
+          </table>
+          <span class="pill" style="margin-top:10px; margin-bottom: -10px" data-i18n="s04.pill1">C + R là input để phân loại; effort là output để so sánh với baseline.</span>
+        </div>
+      </div>
+      <div class="impact-box" style="margin-top:22px;">
+        <p data-i18n="s04.imp.p">CxRy chỉ có giá trị khi được đánh giá theo bộ tiêu chí chung, giúp phân loại ticket nhất quán hơn, làm baseline đáng tin cậy hơn và hỗ trợ estimate dựa trên dữ liệu lịch sử.</p>
+        <strong data-i18n="s04.imp.s">Có guideline chung cho từng mức C1–C5 và R1–R5.</strong>
+      </div>
+      <div style="margin-top:22px;">
+        <span class="pill" data-i18n="s04.pill2">Phân loại ticket → Gán vào CxRy → Lấy baseline cùng nhóm → So sánh actual effort → Review / RCA nếu lệch chuẩn</span>
+      </div>
+      <div class="page">04</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s05.eyebrow">Grouping</div>
+      <h2 data-i18n="s05.h2">Ma trận CxRy: phân loại ticket để so sánh đúng baseline</h2>
+      <div class="matrix">
+        <div class="head" data-i18n="s05.mx00">Complexity \ Risk</div>
+        <div class="head">R1</div><div class="head">R2</div><div class="head">R3</div><div class="head">R4</div><div class="head">R5</div>
+        <div class="side">C1</div><div class="cell tone-1">11</div><div class="cell tone-1">12</div><div class="cell tone-2">13</div><div class="cell tone-3">14</div><div class="cell tone-4">15</div>
+        <div class="side">C2</div><div class="cell tone-1">21</div><div class="cell tone-2">22</div><div class="cell tone-2">23</div><div class="cell tone-3">24</div><div class="cell tone-4">25</div>
+        <div class="side">C3</div><div class="cell tone-2">31</div><div class="cell tone-2">32</div><div class="cell tone-3">33</div><div class="cell tone-3">34</div><div class="cell tone-4">35</div>
+        <div class="side">C4</div><div class="cell tone-3">41</div><div class="cell tone-3">42</div><div class="cell tone-4">43</div><div class="cell tone-4">44</div><div class="cell tone-5">45</div>
+        <div class="side">C5</div><div class="cell tone-4">51</div><div class="cell tone-4">52</div><div class="cell tone-5">53</div><div class="cell tone-5">54</div><div class="cell tone-5">55</div>
+      </div>
+      <div class="impact-band">
+        <div class="impact-box">
+          <strong data-i18n="s05.ib1.t">Điểm mạnh</strong>
+          <p data-i18n="s05.ib1.p">Grouping theo CxRy phản ánh bản chất công việc tốt hơn cách chia score cố định, từ đó làm baseline có tính đại diện hơn.</p>
+        </div>
+        <div class="impact-box">
+          <strong data-i18n="s05.ib2.t">Ý nghĩa vận hành</strong><p data-i18n="s05.ib2.p">Ticket chỉ được so sánh với baseline của đúng nhóm công việc, giúp review effort công bằng hơn và phát hiện bất thường sớm hơn.</p>
+        </div>
+      </div>
+      <div class="page">05</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s06.eyebrow">Metrics</div>
+      <h2 data-i18n="s06.h2">Bộ metric mới để xây baseline và đánh giá ticket theo group CxRy</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-i18n="s06.c1.h3">Total effort (end-to-end)</h3>
+          <ul class="clean">
+            <li data-i18n="s06.c1.li0">Study / Investigation</li>
+            <li data-i18n="s06.c1.li1">Coding</li>
+            <li data-i18n="s06.c1.li2">Unit test</li>
+            <li data-i18n="s06.c1.li3">Code review</li>
+            <li data-i18n="s06.c1.li4">Fix bug trong ticket</li>
+          </ul>
+          <span class="pill" data-i18n="s06.c1.pill">→ Phản ánh đầy đủ hơn effort thực tế của ticket</span>
+        </div>
+        <div class="card">
+          <h3 data-i18n="s06.c2.h3">Core metrics cho mỗi group CxRy</h3>
+          <ul class="clean">
+            <li data-i18n="s06.c2.li0">Mức tham chiếu</li>
+            <ul>
+              <li data-i18n="s06.c2.li0a">P50: effort điển hình</li>
+              <li data-i18n="s06.c2.li0b">P75: ngưỡng cao nhưng còn bình thường</li>
+              <li data-i18n="s06.c2.li0c">P90: ngưỡng cảnh báo</li>
+            </ul>
+            <li data-i18n="s06.c2.li1">Độ tin cậy của baseline</li>
+            <ul>
+              <li data-i18n="s06.c2.li1a">Count: số lượng ticket trong group</li>
+              <li data-i18n="s06.c2.li1b">Variance = P75 / P50: độ ổn định</li>
+              <li data-i18n="s06.c2.li1c">Outlier rate: % ticket vượt 1.5× median</li>
+            </ul>
+          </ul>
+        </div>
+      </div>
+      <div class="impact-band" style="grid-template-columns: 1fr 1fr;">
+        <div class="impact-box">
+          <strong data-i18n="s06.ib1.t">Percentile method</strong>
+          <p data-i18n="s06.ib1.p">P75 và P90 dùng Nearest Rank để ngưỡng là giá trị thực trong dữ liệu.</p>
+        </div>
+        <div class="impact-box">
+          <strong data-i18n="s06.ib2.t">Quality metrics</strong>
+          <p data-i18n="s06.ib2.p0">Bug density = Bug count / Total effort</p>
+          <p data-i18n="s06.ib2.p1">Rework ratio = Rework effort / Total effort</p>
+          <p data-i18n="s06.ib2.p2">Mục tiêu: effort giảm nhưng quality không xấu đi</p>
+        </div>
+      </div>
+      <div class="page">06</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s07.eyebrow">Decision rule</div>
+      <h2 data-i18n="s07.h2">Quy tắc phân loại ticket khi so sánh với baseline</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-i18n="s07.c1.h3">Ý nghĩa vận hành</h3>
+          <ul class="clean">
+            <li data-i18n="s07.c1.li0">Ticket được so sánh với baseline của đúng group CxRy.</li>
+            <li data-i18n="s07.c1.li1">P75 là ngưỡng cao nhưng còn bình thường.</li>
+            <li data-i18n="s07.c1.li2">P90 là ngưỡng bất thường cần phân tích nguyên nhân.</li>
+            <li data-i18n="s07.c1.li3">P25 giúp phát hiện ticket quá nhanh để kiểm tra lại chất lượng hoặc effort log.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 data-i18n="s07.c2.h3">Decision rule</h3>
+          <ul class="clean">
+            <li data-i18n="s07.c2.li0">Actual < P25        → Thấp bất thường, cần review.</li>
+            <li data-i18n="s07.c2.li1">P25 ≤ Actual ≤ P75  → Bình thường</li>
+            <li data-i18n="s07.c2.li2">P75 < Actual ≤ P90  → Cần theo dõi</li>
+            <li data-i18n="s07.c2.li3">Actual > P90         → Bất thường, cần RCA</li>
+          </ul>
+        </div>
+      </div>
+      <div class="impact-band" style="grid-template-columns: 1fr 1fr;">
+        <div class="impact-box">
+          <strong data-i18n="s07.ib1.t">Ưu tiên baseline</strong>
+          <p data-i18n="s07.ib1.p0">Count ≥ 10 → dùng BL_Recently</p>
+          <p data-i18n="s07.ib1.p1">Count < 10 → dùng BL_All-time</p>
+          <p data-i18n="s07.ib1.p2">BL_All-time = 5–9 → chỉ dùng để warning</p>
+          <p data-i18n="s07.ib1.p3">BL_All-time < 5 → không dùng để kết luận</p>
+        </div>
+        <div class="impact-box">
+          <strong data-i18n="s07.ib2.t">Lưu ý</strong>
+          <p data-i18n="s07.ib2.p0">Ticket quá nhanh (< P25) chưa chắc là tốt hơn; cần kiểm tra lại quality hoặc effort log.</p>
+          <p data-i18n="s07.ib2.p1">Ticket > P90 là tín hiệu để review và RCA, không phải kết luận cuối cùng.</p>
+        </div>
+      </div>
+      <div class="page">07</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s08.eyebrow">RCA</div>
+      <h2 data-i18n="s08.h2">Baseline là công cụ phát hiện bất thường và dẫn đến RCA</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-i18n="s08.c1.h3">Khi nào cần RCA / review sâu hơn?</h3>
+          <ul class="clean">
+            <li data-i18n="s08.c1.li0">Ticket > P90: effort bất thường</li>
+            <li data-i18n="s08.c1.li1">Ticket < P25: nhanh bất thường, cần kiểm tra quality hoặc effort log</li>
+            <li data-i18n="s08.c1.li2">Outlier rate của group tăng theo thời gian: dấu hiệu process mất ổn định</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 data-i18n="s08.c2.h3">Nhóm nguyên nhân</h3>
+          <ul class="clean">
+            <li data-i18n="s08.c2.li0">CxRy: phân loại sai nhóm công việc</li>
+            <li data-i18n="s08.c2.li1">Spec: requirement chưa rõ hoặc thay đổi</li>
+            <li data-i18n="s08.c2.li2">Dev: vấn đề trong execution</li>
+            <li data-i18n="s08.c2.li3">System: technical debt / hạn chế hệ thống</li>
+            <li data-i18n="s08.c2.li4">Data: effort log chưa chính xác</li>
+          </ul>
+        </div>
+      </div>
+      <div style="margin-top:22px;">
+        <span class="pill" data-i18n="s08.pill">Ticket lệch chuẩn → Review → RCA → Xác định nguyên nhân → Cải thiện process</span>
+        <div class="impact-box" style="margin-top:22px;">
+        <p data-i18n="s08.box.p">Cursor không phải là yếu tố duy nhất tạo ra improvement. Điều cần đánh giá là liệu toàn bộ quy trình phát triển có vận hành tốt hơn, ổn định hơn và cho chất lượng tốt hơn hay không.</p>
+        </div>
+      </div>
+      <div class="page">08</div>
+    </section>
+
+
+
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s09.eyebrow">Interpretation</div>
+      <h2 data-i18n="s09.h2">Không nên đánh giá Cursor như một yếu tố độc lập</h2>
+      <div class="compare-wrap">
+        <div class="compare-card">
+          <h3 data-i18n="s09.l.h3">Điều dễ kết luận sai</h3>
+          <ul class="clean">
+            <li data-i18n="s09.l.li0">“Nhanh hơn X% là do Cursor”</li>
+            <li data-i18n="s09.l.li1">“Chậm hơn là do Cursor không hiệu quả”</li>
+            <li data-i18n="s09.l.li2">Đo riêng tool rồi rút ra kết luận tổng quát</li>
+          </ul>
+        </div>
+        <div class="vs-arrow">→</div>
+        <div class="compare-card">
+          <h3 data-i18n="s09.r.h3">Cách hiểu phù hợp</h3>
+          <ul class="clean">
+            <li data-i18n-html="s09.r.li0h">Cursor là <strong>công cụ hỗ trợ</strong> trong quy trình phát triển</li>
+            <li data-i18n="s09.r.li1">Kết quả của ticket chịu tác động bởi nhiều yếu tố cùng lúc</li>
+            <li data-i18n-html="s09.r.li2h">Cần đánh giá ở mức <strong>kết quả của toàn bộ quy trình</strong>, không tách riêng từng công cụ</li>
+          </ul>
+        </div>
+      </div>
+      <div class="factor-strip">
+        <div class="factor" data-i18n="s09.f0">Loại công việc</div>
+        <div class="factor" data-i18n="s09.f1">Độ phức tạp</div>
+        <div class="factor" data-i18n="s09.f2">Requirement quality</div>
+        <div class="factor" data-i18n="s09.f3">Kỹ năng thực hiện</div>
+        <div class="factor" data-i18n="s09.f4">Review / Testing</div>
+        <div class="factor" data-i18n="s09.f5">Technical debt</div>
+        <div class="factor" data-i18n="s09.f6">Workflow change</div>
+      </div>
+      <div class="bottom-rule" data-i18n="s09.rule">Điều cần đánh giá không phải là hiệu quả của riêng Cursor, mà là liệu toàn bộ quy trình phát triển có vận hành tốt hơn sau khi đưa Cursor vào sử dụng hay không.</div>
+      <div class="page">09</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s10.eyebrow">Evaluation</div>
+      <h2 data-i18n="s10.h2">Khung đánh giá kết quả sau cải tiến</h2>
+      <div class="score-grid">
+        <div class="score-card">
+          <div class="tag" data-i18n="s10.t1.tag">01 Productivity</div>
+          <h3 data-i18n="s10.t1.h3">Năng suất</h3>
+          <div class="metric" data-i18n="s10.t1.m">Median effort theo tháng</div>
+          <p data-i18n="s10.t1.p">Theo dõi theo từng nhóm CxRy để xem effort điển hình có giảm theo thời gian không.</p>
+        </div>
+        <div class="score-card">
+          <div class="tag" data-i18n="s10.t2.tag">02 Quality</div>
+          <h3 data-i18n="s10.t2.h3">Chất lượng</h3>
+          <div class="metric" data-i18n="s10.t2.m">Bug density &amp; Rework ratio</div>
+          <p data-i18n="s10.t2.p">Kiểm tra việc tăng tốc có đi kèm giảm chất lượng hoặc tăng effort sửa lại hay không.</p>
+        </div>
+        <div class="score-card">
+          <div class="tag" data-i18n="s10.t3.tag">03 Stability</div>
+          <h3 data-i18n="s10.t3.h3">Độ ổn định</h3>
+          <div class="metric" data-i18n="s10.t3.m">Variance</div>
+          <p data-i18n="s10.t3.p">Đánh giá mức độ ổn định và khả năng dự đoán của effort theo thời gian.</p>
+        </div>
+        <div class="score-card">
+          <div class="tag" data-i18n="s10.t4.tag">04 Performance</div>
+          <h3 data-i18n="s10.t4.h3">Hiệu suất</h3>
+          <div class="metric" data-i18n="s10.t4.m">P75 &amp; P90</div>
+          <p data-i18n="s10.t4.p">Theo dõi tỷ lệ ticket nằm trong vùng kỳ vọng và tỷ lệ ticket cần RCA.</p>
+        </div>
+      </div>
+      <div class="bottom-rule" data-i18n="s10.rule">Chỉ kết luận là “tốt hơn” khi productivity cải thiện nhưng quality không giảm, stability không xấu đi và tỷ lệ abnormal không tăng.</div>
+      <div class="page">10</div>
+    </section>
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s11.eyebrow">Takeaway</div>
+      <h2 data-i18n="s11.h2">Kết luận và giá trị tổ chức</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-i18n="s11.c1.h3">Framework mới thay đổi điều gì</h3>
+          <ul class="clean">
+            <li data-i18n="s11.c1.li0">Phân loại ticket theo CxRy thay cho chấm điểm CRE cảm tính.</li>
+            <li data-i18n="s11.c1.li1">Đo end-to-end effort thay vì chỉ coding + fix bug</li>
+            <li data-i18n="s11.c1.li2">So sánh ticket với baseline của đúng nhóm công việc</li>
+            <li data-i18n="s11.c1.li3">Dùng baseline để review, cảnh báo và RCA</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 data-i18n="s11.c2.h3">Giá trị ở cấp tổ chức</h3>
+          <ul class="clean">
+            <li data-i18n="s11.c2.li0">Hình thành chuẩn tham chiếu nội bộ cho từng nhóm công việc</li>
+            <li data-i18n="s11.c2.li1">Giúp estimate và planning dựa nhiều hơn vào dữ liệu lịch sử</li>
+            <li data-i18n="s11.c2.li2">Giảm phụ thuộc vào cảm tính cá nhân khi lập kế hoạch và review effort</li>
+          </ul>
+        </div>
+      </div>
+      <div class="impact-box" style="margin-top:22px;">
+        <p data-i18n-html="s11.close">Không nên tách riêng Cursor để đánh giá hiệu quả.<br>Điều cần đánh giá là kết quả của toàn bộ quy trình phát triển<br>Chỉ kết luận là “tốt hơn” khi productivity tăng, quality không giảm, stability không xấu đi và performance nằm trong vùng kỳ vọng</p>
+      </div>
+      <div class="page">11</div>
+    </section>
+  </div>
+  <script src="proposal-app.js"></script>
+</body>
+</html>
