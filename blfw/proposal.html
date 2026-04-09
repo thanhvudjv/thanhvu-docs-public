@@ -399,6 +399,73 @@
     .score-card p { font-size:16px; line-height:1.45; color:var(--muted); }
     .bottom-rule { margin-top:18px; background:#111827; color:#fff; border-radius:20px; padding:18px 22px; font-size:18px; line-height:1.45; }
 
+    .slide-flow-dense h2 { margin-bottom: 12px; }
+    .slide-flow-dense .grid-2 { margin-top: 14px; gap: 16px; }
+    .slide-flow-dense .card { padding: 16px 18px; }
+    .slide-flow-dense .card h3 { font-size: 19px; margin-bottom: 6px; }
+    .slide-flow-dense ul.flow-steps.clean { margin-top: 6px; }
+    .slide-flow-dense ul.flow-steps.clean li { margin: 5px 0; }
+    .slide-flow-dense .flow-steps > li > strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 2px;
+      color: var(--text);
+    }
+    .slide-flow-dense .flow-step-note strong {
+      display: inline;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .slide-flow-dense .flow-steps > li > span:not(.flow-chip) {
+      display: block;
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+    .slide-flow-dense .flow-step-note {
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--muted);
+      padding-left: 12px;
+      border-left: 3px solid #d0d5dd;
+    }
+    .slide-flow-dense .pill { font-size: 13px; margin-top: 0; }
+
+    .slide-flow-dense .flow-out-list { list-style: none; padding-left: 0; margin: 8px 0 0; }
+    .slide-flow-dense .flow-out-item { margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+    .slide-flow-dense .flow-out-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+    .slide-flow-dense .flow-out-item > strong { font-size: 15px; }
+    .slide-flow-dense .flow-out-item > span.flow-out-desc {
+      display: block;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .slide-flow-dense .flow-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .slide-flow-dense .flow-chip {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      color: var(--muted);
+    }
+    .slide-flow-dense .flow-chip--low { background: #ecfdf5; border-color: #abefc6; color: #027a48; }
+    .slide-flow-dense .flow-chip--norm { background: #f2f4f7; border-color: #e4e7ec; color: #344054; }
+    .slide-flow-dense .flow-chip--warn { background: #fffaeb; border-color: #fedf89; color: #b54708; }
+    .slide-flow-dense .flow-chip--abn { background: #fef3f2; border-color: #fecdca; color: #b42318; }
+    .slide-flow-dense .flow-chip--neutral { background: #fff; }
+
     @media print {
       body {
         background: #fff;
@@ -686,133 +753,212 @@
       <div class="page">07</div>
     </section>
 
-    <section class="slide">
-      <div class="eyebrow" data-i18n="s08.eyebrow">RCA</div>
-      <h2 data-i18n="s08.h2">Baseline là công cụ phát hiện bất thường và dẫn đến RCA</h2>
+    <section class="slide slide-flow-dense">
+      <div class="eyebrow" data-i18n="s08.eyebrow">OPERATING FLOW</div>
+      <h2 data-i18n="s08.h2">Quy trình vận hành baseline theo tháng</h2>
       <div class="grid-2">
         <div class="card">
-          <h3 data-i18n="s08.c1.h3">Khi nào cần RCA / review sâu hơn?</h3>
-          <ul class="clean">
-            <li data-i18n="s08.c1.li0">Ticket > P90: effort bất thường</li>
-            <li data-i18n="s08.c1.li1">Ticket < P25: nhanh bất thường, cần kiểm tra quality hoặc effort log</li>
-            <li data-i18n="s08.c1.li2">Outlier rate của group tăng theo thời gian: dấu hiệu process mất ổn định</li>
+          <h3 data-i18n="s08.c1.h3">Chu kỳ tháng</h3>
+          <ul class="clean flow-steps">
+            <li>
+              <strong data-i18n="s08.c1.t0">Thu thập &amp; chuẩn hóa</strong>
+              <span data-i18n="s08.c1.d0">C · R · CxRy · Effort · Bug · Rework</span>
+            </li>
+            <li>
+              <strong data-i18n="s08.c1.t1">Map baseline</strong>
+              <span data-i18n="s08.c1.d1">P25–P90 · đúng CxRy</span>
+            </li>
+            <li>
+              <strong data-i18n="s08.c1.t2">So sánh · phân loại</strong>
+              <span data-i18n="s08.c1.d2">vs ngưỡng baseline</span>
+            </li>
+            <li>
+              <strong data-i18n="s08.c1.t3">RCA lệch chuẩn</strong>
+              <div class="flow-step-note" data-i18n-html="s08.c1.note4"><strong>&gt; P90</strong> → bắt buộc RCA<br><strong>&lt; P25</strong> → review effort log / quality / grouping</div>
+            </li>
+            <li>
+              <strong data-i18n="s08.c1.t4">Action</strong>
+              <span data-i18n="s08.c1.d4">Root cause → cải tiến</span>
+            </li>
+            <li>
+              <strong data-i18n="s08.c1.t5">Rolling baseline</strong>
+              <span data-i18n="s08.c1.d5">Cập nhật lại baseline bằng 4 tháng gần nhất và theo dõi trend</span>
+            </li>
           </ul>
         </div>
         <div class="card">
-          <h3 data-i18n="s08.c2.h3">Nhóm nguyên nhân</h3>
-          <ul class="clean">
-            <li data-i18n="s08.c2.li0">CxRy: phân loại sai nhóm công việc</li>
-            <li data-i18n="s08.c2.li1">Spec: requirement chưa rõ hoặc thay đổi</li>
-            <li data-i18n="s08.c2.li2">Dev: vấn đề trong execution</li>
-            <li data-i18n="s08.c2.li3">System: technical debt / hạn chế hệ thống</li>
-            <li data-i18n="s08.c2.li4">Data: effort log chưa chính xác</li>
+          <h3 data-i18n="s08.c2.h3">Output kỳ review</h3>
+          <ul class="clean flow-steps flow-out-list">
+            <li class="flow-out-item">
+              <strong data-i18n="s08.c2.i0t">Danh sách ticket theo 4 trạng thái</strong>
+              <div class="flow-chip-row">
+                <span class="flow-chip flow-chip--low" data-i18n="s08.c2.st0">Low</span>
+                <span class="flow-chip flow-chip--norm" data-i18n="s08.c2.st1">Normal</span>
+                <span class="flow-chip flow-chip--warn" data-i18n="s08.c2.st2">Warning</span>
+                <span class="flow-chip flow-chip--abn" data-i18n="s08.c2.st3">Abnormal</span>
+              </div>
+            </li>
+            <li class="flow-out-item">
+              <strong data-i18n="s08.c2.i1t">RCA / review sâu</strong>
+              <span class="flow-out-desc" data-i18n="s08.c2.i1d">Tập trung vào &gt;P90 và review thêm &lt;P25 khi cần</span>
+            </li>
+            <li class="flow-out-item">
+              <strong data-i18n="s08.c2.i2t">RCA tổng hợp theo nhóm nguyên nhân</strong>
+              <div class="flow-chip-row">
+                <span class="flow-chip flow-chip--neutral" data-i18n="s08.c2.c0">CxRy</span>
+                <span class="flow-chip flow-chip--neutral" data-i18n="s08.c2.c1">Spec</span>
+                <span class="flow-chip flow-chip--neutral" data-i18n="s08.c2.c2">Dev</span>
+                <span class="flow-chip flow-chip--neutral" data-i18n="s08.c2.c3">System</span>
+                <span class="flow-chip flow-chip--neutral" data-i18n="s08.c2.c4">Dependency</span>
+                <span class="flow-chip flow-chip--neutral" data-i18n="s08.c2.c5">Data</span>
+              </div>
+            </li>
+            <li class="flow-out-item">
+              <strong data-i18n="s08.c2.i3t">Baseline &amp; trend tháng mới</strong>
+              <div class="flow-chip-row">
+                <span class="flow-chip" data-i18n="s08.c2.m0">Median</span>
+                <span class="flow-chip" data-i18n="s08.c2.m1">P75</span>
+                <span class="flow-chip" data-i18n="s08.c2.m2">P90</span>
+                <span class="flow-chip" data-i18n="s08.c2.m3">Stability</span>
+                <span class="flow-chip" data-i18n="s08.c2.m4">Outlier</span>
+              </div>
+            </li>
           </ul>
         </div>
       </div>
-      <div style="margin-top:22px;">
-        <span class="pill" data-i18n="s08.pill">Ticket lệch chuẩn → Review → RCA → Xác định nguyên nhân → Cải thiện process</span>
-        <div class="impact-box" style="margin-top:22px;">
-        <p data-i18n="s08.box.p">Cursor không phải là yếu tố duy nhất tạo ra improvement. Điều cần đánh giá là liệu toàn bộ quy trình phát triển có vận hành tốt hơn, ổn định hơn và cho chất lượng tốt hơn hay không.</p>
-        </div>
+      <div style="margin-top:14px;">
+        <span class="pill" data-i18n="s08.pill">Chuẩn hóa → Map CxRy → So sánh → RCA/Action → Rolling → Trend</span>
       </div>
       <div class="page">08</div>
     </section>
 
+    <section class="slide">
+      <div class="eyebrow" data-i18n="s09.eyebrow">RCA</div>
+      <h2 data-i18n="s09.h2">Baseline là công cụ phát hiện bất thường và dẫn đến RCA</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 data-i18n="s09.c1.h3">Khi nào cần RCA / review sâu hơn?</h3>
+          <ul class="clean">
+            <li data-i18n="s09.c1.li0">Ticket > P90: effort bất thường</li>
+            <li data-i18n="s09.c1.li1">Ticket < P25: nhanh bất thường, cần kiểm tra quality hoặc effort log</li>
+            <li data-i18n="s09.c1.li2">Outlier rate của group tăng theo thời gian: dấu hiệu process mất ổn định</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 data-i18n="s09.c2.h3">Nhóm nguyên nhân</h3>
+          <ul class="clean">
+            <li data-i18n="s09.c2.li0">CxRy: phân loại sai nhóm công việc</li>
+            <li data-i18n="s09.c2.li1">Spec: requirement chưa rõ hoặc thay đổi</li>
+            <li data-i18n="s09.c2.li2">Dev: vấn đề trong execution</li>
+            <li data-i18n="s09.c2.li3">System: technical debt / hạn chế hệ thống</li>
+            <li data-i18n="s09.c2.li4">Data: effort log chưa chính xác</li>
+          </ul>
+        </div>
+      </div>
+      <div style="margin-top:22px;">
+        <span class="pill" data-i18n="s09.pill">Ticket lệch chuẩn → Review → RCA → Xác định nguyên nhân → Cải thiện process</span>
+        <div class="impact-box" style="margin-top:22px;">
+        <p data-i18n="s09.box.p">Cursor không phải là yếu tố duy nhất tạo ra improvement. Điều cần đánh giá là liệu toàn bộ quy trình phát triển có vận hành tốt hơn, ổn định hơn và cho chất lượng tốt hơn hay không.</p>
+        </div>
+      </div>
+      <div class="page">09</div>
+    </section>
+
 
 
     <section class="slide">
-      <div class="eyebrow" data-i18n="s09.eyebrow">Interpretation</div>
-      <h2 data-i18n="s09.h2">Không nên đánh giá Cursor như một yếu tố độc lập</h2>
+      <div class="eyebrow" data-i18n="s10.eyebrow">Interpretation</div>
+      <h2 data-i18n="s10.h2">Không nên đánh giá Cursor như một yếu tố độc lập</h2>
       <div class="compare-wrap">
         <div class="compare-card">
-          <h3 data-i18n="s09.l.h3">Điều dễ kết luận sai</h3>
+          <h3 data-i18n="s10.l.h3">Điều dễ kết luận sai</h3>
           <ul class="clean">
-            <li data-i18n="s09.l.li0">“Nhanh hơn X% là do Cursor”</li>
-            <li data-i18n="s09.l.li1">“Chậm hơn là do Cursor không hiệu quả”</li>
-            <li data-i18n="s09.l.li2">Đo riêng tool rồi rút ra kết luận tổng quát</li>
+            <li data-i18n="s10.l.li0">“Nhanh hơn X% là do Cursor”</li>
+            <li data-i18n="s10.l.li1">“Chậm hơn là do Cursor không hiệu quả”</li>
+            <li data-i18n="s10.l.li2">Đo riêng tool rồi rút ra kết luận tổng quát</li>
           </ul>
         </div>
         <div class="vs-arrow">→</div>
         <div class="compare-card">
-          <h3 data-i18n="s09.r.h3">Cách hiểu phù hợp</h3>
+          <h3 data-i18n="s10.r.h3">Cách hiểu phù hợp</h3>
           <ul class="clean">
-            <li data-i18n-html="s09.r.li0h">Cursor là <strong>công cụ hỗ trợ</strong> trong quy trình phát triển</li>
-            <li data-i18n="s09.r.li1">Kết quả của ticket chịu tác động bởi nhiều yếu tố cùng lúc</li>
-            <li data-i18n-html="s09.r.li2h">Cần đánh giá ở mức <strong>kết quả của toàn bộ quy trình</strong>, không tách riêng từng công cụ</li>
+            <li data-i18n-html="s10.r.li0h">Cursor là <strong>công cụ hỗ trợ</strong> trong quy trình phát triển</li>
+            <li data-i18n="s10.r.li1">Kết quả của ticket chịu tác động bởi nhiều yếu tố cùng lúc</li>
+            <li data-i18n-html="s10.r.li2h">Cần đánh giá ở mức <strong>kết quả của toàn bộ quy trình</strong>, không tách riêng từng công cụ</li>
           </ul>
         </div>
       </div>
       <div class="factor-strip">
-        <div class="factor" data-i18n="s09.f0">Loại công việc</div>
-        <div class="factor" data-i18n="s09.f1">Độ phức tạp</div>
-        <div class="factor" data-i18n="s09.f2">Requirement quality</div>
-        <div class="factor" data-i18n="s09.f3">Kỹ năng thực hiện</div>
-        <div class="factor" data-i18n="s09.f4">Review / Testing</div>
-        <div class="factor" data-i18n="s09.f5">Technical debt</div>
-        <div class="factor" data-i18n="s09.f6">Workflow change</div>
+        <div class="factor" data-i18n="s10.f0">Loại công việc</div>
+        <div class="factor" data-i18n="s10.f1">Độ phức tạp</div>
+        <div class="factor" data-i18n="s10.f2">Requirement quality</div>
+        <div class="factor" data-i18n="s10.f3">Kỹ năng thực hiện</div>
+        <div class="factor" data-i18n="s10.f4">Review / Testing</div>
+        <div class="factor" data-i18n="s10.f5">Technical debt</div>
+        <div class="factor" data-i18n="s10.f6">Workflow change</div>
       </div>
-      <div class="bottom-rule" data-i18n="s09.rule">Điều cần đánh giá không phải là hiệu quả của riêng Cursor, mà là liệu toàn bộ quy trình phát triển có vận hành tốt hơn sau khi đưa Cursor vào sử dụng hay không.</div>
-      <div class="page">09</div>
+      <div class="bottom-rule" data-i18n="s10.rule">Điều cần đánh giá không phải là hiệu quả của riêng Cursor, mà là liệu toàn bộ quy trình phát triển có vận hành tốt hơn sau khi đưa Cursor vào sử dụng hay không.</div>
+      <div class="page">10</div>
     </section>
 
     <section class="slide">
-      <div class="eyebrow" data-i18n="s10.eyebrow">Evaluation</div>
-      <h2 data-i18n="s10.h2">Khung đánh giá kết quả sau cải tiến</h2>
+      <div class="eyebrow" data-i18n="s11.eyebrow">Evaluation</div>
+      <h2 data-i18n="s11.h2">Khung đánh giá kết quả sau cải tiến</h2>
       <div class="score-grid">
         <div class="score-card">
-          <div class="tag" data-i18n="s10.t1.tag">01 Productivity</div>
-          <h3 data-i18n="s10.t1.h3">Năng suất</h3>
-          <div class="metric" data-i18n="s10.t1.m">Median effort theo tháng</div>
-          <p data-i18n="s10.t1.p">Theo dõi theo từng nhóm CxRy để xem effort điển hình có giảm theo thời gian không.</p>
+          <div class="tag" data-i18n="s11.t1.tag">01 Productivity</div>
+          <h3 data-i18n="s11.t1.h3">Năng suất</h3>
+          <div class="metric" data-i18n="s11.t1.m">Median effort theo tháng</div>
+          <p data-i18n="s11.t1.p">Theo dõi theo từng nhóm CxRy để xem effort điển hình có giảm theo thời gian không.</p>
         </div>
         <div class="score-card">
-          <div class="tag" data-i18n="s10.t2.tag">02 Quality</div>
-          <h3 data-i18n="s10.t2.h3">Chất lượng</h3>
-          <div class="metric" data-i18n="s10.t2.m">Bug density &amp; Rework ratio</div>
-          <p data-i18n="s10.t2.p">Kiểm tra việc tăng tốc có đi kèm giảm chất lượng hoặc tăng effort sửa lại hay không.</p>
+          <div class="tag" data-i18n="s11.t2.tag">02 Quality</div>
+          <h3 data-i18n="s11.t2.h3">Chất lượng</h3>
+          <div class="metric" data-i18n="s11.t2.m">Bug density &amp; Rework ratio</div>
+          <p data-i18n="s11.t2.p">Kiểm tra việc tăng tốc có đi kèm giảm chất lượng hoặc tăng effort sửa lại hay không.</p>
         </div>
         <div class="score-card">
-          <div class="tag" data-i18n="s10.t3.tag">03 Stability</div>
-          <h3 data-i18n="s10.t3.h3">Độ ổn định</h3>
-          <div class="metric" data-i18n="s10.t3.m">Variance</div>
-          <p data-i18n="s10.t3.p">Đánh giá mức độ ổn định và khả năng dự đoán của effort theo thời gian.</p>
+          <div class="tag" data-i18n="s11.t3.tag">03 Stability</div>
+          <h3 data-i18n="s11.t3.h3">Độ ổn định</h3>
+          <div class="metric" data-i18n="s11.t3.m">Variance</div>
+          <p data-i18n="s11.t3.p">Đánh giá mức độ ổn định và khả năng dự đoán của effort theo thời gian.</p>
         </div>
         <div class="score-card">
-          <div class="tag" data-i18n="s10.t4.tag">04 Performance</div>
-          <h3 data-i18n="s10.t4.h3">Hiệu suất</h3>
-          <div class="metric" data-i18n="s10.t4.m">P75 &amp; P90</div>
-          <p data-i18n="s10.t4.p">Theo dõi tỷ lệ ticket nằm trong vùng kỳ vọng và tỷ lệ ticket cần RCA.</p>
+          <div class="tag" data-i18n="s11.t4.tag">04 Performance</div>
+          <h3 data-i18n="s11.t4.h3">Hiệu suất</h3>
+          <div class="metric" data-i18n="s11.t4.m">P75 &amp; P90</div>
+          <p data-i18n="s11.t4.p">Theo dõi tỷ lệ ticket nằm trong vùng kỳ vọng và tỷ lệ ticket cần RCA.</p>
         </div>
       </div>
-      <div class="bottom-rule" data-i18n="s10.rule">Chỉ kết luận là “tốt hơn” khi productivity cải thiện nhưng quality không giảm, stability không xấu đi và tỷ lệ abnormal không tăng.</div>
-      <div class="page">10</div>
+      <div class="bottom-rule" data-i18n="s11.rule">Chỉ kết luận là “tốt hơn” khi productivity cải thiện nhưng quality không giảm, stability không xấu đi và tỷ lệ abnormal không tăng.</div>
+      <div class="page">11</div>
     </section>
     <section class="slide">
-      <div class="eyebrow" data-i18n="s11.eyebrow">Takeaway</div>
-      <h2 data-i18n="s11.h2">Kết luận và giá trị tổ chức</h2>
+      <div class="eyebrow" data-i18n="s12.eyebrow">Takeaway</div>
+      <h2 data-i18n="s12.h2">Kết luận và giá trị tổ chức</h2>
       <div class="grid-2">
         <div class="card">
-          <h3 data-i18n="s11.c1.h3">Framework mới thay đổi điều gì</h3>
+          <h3 data-i18n="s12.c1.h3">Framework mới thay đổi điều gì</h3>
           <ul class="clean">
-            <li data-i18n="s11.c1.li0">Phân loại ticket theo CxRy thay cho chấm điểm CRE cảm tính.</li>
-            <li data-i18n="s11.c1.li1">Đo end-to-end effort thay vì chỉ coding + fix bug</li>
-            <li data-i18n="s11.c1.li2">So sánh ticket với baseline của đúng nhóm công việc</li>
-            <li data-i18n="s11.c1.li3">Dùng baseline để review, cảnh báo và RCA</li>
+            <li data-i18n="s12.c1.li0">Phân loại ticket theo CxRy thay cho chấm điểm CRE cảm tính.</li>
+            <li data-i18n="s12.c1.li1">Đo end-to-end effort thay vì chỉ coding + fix bug</li>
+            <li data-i18n="s12.c1.li2">So sánh ticket với baseline của đúng nhóm công việc</li>
+            <li data-i18n="s12.c1.li3">Dùng baseline để review, cảnh báo và RCA</li>
           </ul>
         </div>
         <div class="card">
-          <h3 data-i18n="s11.c2.h3">Giá trị ở cấp tổ chức</h3>
+          <h3 data-i18n="s12.c2.h3">Giá trị ở cấp tổ chức</h3>
           <ul class="clean">
-            <li data-i18n="s11.c2.li0">Hình thành chuẩn tham chiếu nội bộ cho từng nhóm công việc</li>
-            <li data-i18n="s11.c2.li1">Giúp estimate và planning dựa nhiều hơn vào dữ liệu lịch sử</li>
-            <li data-i18n="s11.c2.li2">Giảm phụ thuộc vào cảm tính cá nhân khi lập kế hoạch và review effort</li>
+            <li data-i18n="s12.c2.li0">Hình thành chuẩn tham chiếu nội bộ cho từng nhóm công việc</li>
+            <li data-i18n="s12.c2.li1">Giúp estimate và planning dựa nhiều hơn vào dữ liệu lịch sử</li>
+            <li data-i18n="s12.c2.li2">Giảm phụ thuộc vào cảm tính cá nhân khi lập kế hoạch và review effort</li>
           </ul>
         </div>
       </div>
       <div class="impact-box" style="margin-top:22px;">
-        <p data-i18n-html="s11.close">Không nên tách riêng Cursor để đánh giá hiệu quả.<br>Điều cần đánh giá là kết quả của toàn bộ quy trình phát triển<br>Chỉ kết luận là “tốt hơn” khi productivity tăng, quality không giảm, stability không xấu đi và performance nằm trong vùng kỳ vọng</p>
+        <p data-i18n-html="s12.close">Không nên tách riêng Cursor để đánh giá hiệu quả.<br>Điều cần đánh giá là kết quả của toàn bộ quy trình phát triển<br>Chỉ kết luận là “tốt hơn” khi productivity tăng, quality không giảm, stability không xấu đi và performance nằm trong vùng kỳ vọng</p>
       </div>
-      <div class="page">11</div>
+      <div class="page">12</div>
     </section>
   </div>
   <script src="proposal-app.js"></script>
