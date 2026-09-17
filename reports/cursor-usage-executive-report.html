@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adoption Cursor AI — Báo cáo quản lý</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #1e1e1e;
+      --surface: #252526;
+      --border: #3c3c3c;
+      --text: #e4e4e4;
+      --muted: #9d9d9d;
+      --accent: #3794ff;
+      --info-bg: rgba(55, 148, 255, 0.12);
+      --warn-bg: rgba(204, 120, 50, 0.15);
+      --warn-border: #cc7832;
+      --font: "Segoe UI", system-ui, sans-serif;
+      --font-ja: "Yu Gothic UI", "Hiragino Sans", "Meiryo", sans-serif;
+    }
+    [data-theme="light"] {
+      --bg: #f5f5f5;
+      --surface: #ffffff;
+      --border: #e0e0e0;
+      --text: #1a1a1a;
+      --muted: #666;
+      --accent: #0066cc;
+      --info-bg: rgba(0, 102, 204, 0.08);
+      --warn-bg: rgba(204, 120, 50, 0.1);
+    }
+    [data-lang="ja"] body { font-family: var(--font-ja), var(--font); }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.5;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 24px; }
+    header { margin-bottom: 20px; padding-right: 200px; }
+    h1 { font-size: 24px; font-weight: 600; margin: 0 0 4px; }
+    .meta { color: var(--muted); font-size: 13px; }
+    .toolbar {
+      float: right;
+      margin-top: -36px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .toolbar button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .toolbar button:hover { border-color: var(--accent); }
+    .toolbar button.active { border-color: var(--accent); background: var(--info-bg); }
+    h2 { font-size: 18px; font-weight: 600; margin: 28px 0 12px; }
+    .callout {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 16px 0;
+      background: var(--surface);
+    }
+    .callout.info { border-left: 3px solid var(--accent); background: var(--info-bg); }
+    .callout.warn { border-left: 3px solid var(--warn-border); background: var(--warn-bg); }
+    .callout-title { font-weight: 600; margin-bottom: 8px; }
+    .callout p { margin: 0 0 8px; font-size: 13px; }
+    .callout p:last-child { margin-bottom: 0; }
+    .note { font-size: 13px; color: var(--muted); margin: 8px 0; }
+    .note strong { color: var(--text); }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 720px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      header { padding-right: 0; }
+      .toolbar { float: none; margin: 0 0 12px; }
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .card-h { padding: 12px 14px; font-weight: 600; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .card-b { padding: 14px; }
+    .chart-box { position: relative; height: 220px; }
+    .chart-box.sm { height: 200px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th { background: var(--bg); font-weight: 600; }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    details { margin-top: 24px; font-size: 13px; color: var(--muted); }
+    details summary { cursor: pointer; color: var(--text); font-weight: 600; }
+    details ul { padding-left: 20px; }
+    @media print {
+      .toolbar { display: none; }
+      body { background: #fff; color: #000; }
+      .card, .callout { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body data-theme="dark" data-lang="vi">
+  <div class="wrap">
+    <div class="toolbar">
+      <button type="button" id="langVi" class="active">Tiếng Việt</button>
+      <button type="button" id="langJa">日本語</button>
+      <button type="button" id="themeBtn">Giao diện sáng</button>
+    </div>
+    <header>
+      <h1 id="txtTitle"></h1>
+      <p class="meta" id="txtMeta"></p>
+    </header>
+
+    <div class="callout info">
+      <div class="callout-title" id="txtConclusionTitle"></div>
+      <p id="txtConclusion1"></p>
+      <p id="txtConclusion2"></p>
+    </div>
+
+    <h2 id="txtSec1"></h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-h" id="txtChartMonthlyH"></div>
+        <div class="card-b">
+          <div class="chart-box"><canvas id="chartMonthly"></canvas></div>
+          <p class="note" id="txtChartMonthlyN"></p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="txtChartIntensityH"></div>
+        <div class="card-b">
+          <div class="chart-box sm"><canvas id="chartIntensity"></canvas></div>
+          <p class="note" id="txtChartIntensityN"></p>
+        </div>
+      </div>
+    </div>
+
+    <h2 id="txtSec2"></h2>
+    <p class="note" id="txtCalc"></p>
+    <p class="note" id="txtRank"></p>
+    <p class="note" id="txtSec2Detail"></p>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-h" id="txtTopH"></div>
+      <div class="card-b" style="overflow-x:auto">
+        <table id="tblTop"></table>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-h" id="txtBottomH"></div>
+      <div class="card-b" style="overflow-x:auto">
+        <table id="tblBottom"></table>
+      </div>
+    </div>
+
+    <h2 id="txtSec3"></h2>
+    <div class="card">
+      <div class="card-b grid-2" style="align-items:center">
+        <div class="chart-box sm"><canvas id="chartModel"></canvas></div>
+        <div>
+          <p style="margin:0 0 8px;font-size:13px" id="txtModel1"></p>
+          <p class="note" id="txtModel2"></p>
+        </div>
+      </div>
+    </div>
+
+    <h2 id="txtSec4"></h2>
+    <p class="note" id="txtSec4Note"></p>
+    <div class="callout warn">
+      <div class="callout-title" id="txtWarnTitle"></div>
+      <p id="txtWarnBody"></p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-h" id="txtLimitPieH"></div>
+        <div class="card-b">
+          <div class="chart-box sm"><canvas id="chartLimitPie"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="txtLimitWeekH"></div>
+        <div class="card-b">
+          <div class="chart-box sm"><canvas id="chartLimitWeek"></canvas></div>
+          <p class="note" id="txtLimitWeekN"></p>
+        </div>
+      </div>
+    </div>
+
+    <details>
+      <summary id="txtAppendixTitle"></summary>
+      <ul id="txtAppendixList"></ul>
+    </details>
+  </div>
+
+  <script>
+    const TOP5 = [
+      ["1","リン Linh BE","Dev08","231","18,0","24,0","749","1 / 1"],
+      ["2","アン An","Dev02","231","15,0","19,0","791","2 / 6"],
+      ["3","ジエン Dien","Dev02","231","14,5","19,6","741","4 / 4"],
+      ["4","グエンソン Son","Dev01","231","14,7","17,2","857","3 / 8"],
+      ["5","ホンー Hong FE","Dev09","232","12,1","19,3","629","6 / 5"],
+    ];
+    const BOTTOM5 = [
+      ["1","タィンナム Nam Android","Dev12","231","3,3","4,6","730","43 / 43"],
+      ["2","グェンチュン Chung BE","Dev11","231","4,4","5,6","784","41 / 42"],
+      ["3","ホアンアイン Anh FE","Dev03","231","4,3","6,5","667","42 / 40"],
+      ["4","ダット Dat","Dev06","231","4,4","6,2","715","40 / 41"],
+      ["5","チュンタイン Thanh","Dev12","231","4,6","8,0","571","39 / 38"],
+    ];
+
+    const I18N = {
+      vi: {
+        docTitle: "Adoption Cursor AI — Báo cáo quản lý",
+        title: "Adoption Cursor AI — Báo cáo quản lý",
+        meta: "Kỳ 23/01/2026 – 15/09/2026 · Cursor Analytics canonical đến 15/09 · token/người từ team-usage-events (export 14/09)",
+        conclusionTitle: "Kết luận chính",
+        conclusion1: 'Giai đoạn sau rollout, Cursor đã trở thành công cụ làm việc thường xuyên của dev VN: không có ai trong danh sách dev đang làm việc bị zero usage suốt kỳ báo cáo; cường độ team khoảng <strong>1,9×</strong> so với đầu kỳ và duy trì ổn định từ giữa năm (chi tiết mục 1).',
+        conclusion2: 'Khảo sát nội bộ: <strong>~24,4%</strong> thường chạm limit, chủ yếu cuối chu kỳ (tuần 3–4) — hết quota trước ngày reset (chi tiết mục 4).',
+        sec1: "1 · Xu hướng & giai đoạn",
+        chartMonthlyH: "AI events theo tháng",
+        chartMonthlyN: "09/26 đến 15/09 · ~52–54 user/tháng từ 03/26",
+        chartIntensityH: "Đầu kỳ vs gần đây",
+        chartIntensityN: "AI lines (added+deleted): 0,93M → 2,19M dòng · Timeseries",
+        chartMonthlyLabel: "Events / tháng (Usage API)",
+        chartIntensityLabels: ["Đầu kỳ\n(23/01–31/03)", "Gần đây\n(06–15/09)"],
+        chartIntensitySeries: "TB events / ngày",
+        sec2: "2 · Phân bố người dùng (active roster, n=43)",
+        calc: "<strong>Cách tính:</strong> token/ngày và event/ngày = tổng kỳ ÷ số ngày từ ngày cấp TK → 15/09",
+        rank: "<strong>Cách xếp hạng:</strong> composite = trung bình hạng hai chỉ số",
+        sec2Detail: "token/ngày — Total Tokens (export 14/09) ÷ ngày eligible; event/ngày — mỗi dòng export = 1 event. Ngày cấp TK: sheet Account_List.",
+        tableHeaders: ["#","氏名","Team","Ngày eligible","Token/ngày (M)","Event/ngày","Token/event (K)","Hạng token · event"],
+        topH: "Top 5 — mức sử dụng cao (composite)",
+        bottomH: "Bottom 5 — mức sử dụng thấp (composite)",
+        sec3: "3 · Model (phân bố token)",
+        modelOther: "Khác",
+        model1: "auto và Composer 2.5-fast chiếm ~95% tổng token team (~105B trong kỳ).",
+        model2: "Request-level (Analytics API): default/Auto ~80% request.",
+        sec4: "4 · Quota & chạm limit (khảo sát nội bộ)",
+        sec4Note: "<strong>Ghi chú:</strong> Chu kỳ hạn mức Cursor reset từ ngày 23 hàng tháng.",
+        warnTitle: "~24% dev phản hồi hết hạn mức — quota cá nhân chưa đủ",
+        warnBody: '~24,4% dev phản hồi (<strong>10/41</strong>) thường xuyên hết hạn mức trong chu kỳ — phần lớn chạm limit muộn (tuần 3–4), tức hết quota <strong>trước</strong> khi chu kỳ reset tiếp theo. Khớp với adoption cao ở mục 1–2: member dùng nhiều nhưng trần cá nhân không theo kịp nhu cầu. Giải pháp tạm thời đang phổ biến: mượn tài khoản đồng nghiệp (<strong>8/10</strong> người chạm limit).',
+        limitPieH: "Tỷ lệ chạm limit trong chu kỳ",
+        limitPieLabels: ["Chạm limit (10)", "Không chạm (31)"],
+        limitWeekH: "Tuần chạm limit (trong chu kỳ từ ngày 23)",
+        limitWeekLabels: ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4"],
+        limitWeekSeries: "Số người",
+        limitWeekN: "Đa số chạm limit ở tuần 3–4, trước ngày reset.",
+        appendixTitle: "Phụ lục — Định nghĩa & nguồn",
+        appendixItems: [
+          "<strong>Event (Usage API):</strong> tổng composer + agent + chat + cmdK + API key theo ngày (canonical CSV).",
+          "<strong>Event / token (bảng người dùng):</strong> mỗi dòng team-usage-events; composite rank = (hạng token/ngày + hạng events/ngày) / 2 trong pool 43 active có usage.",
+          "<strong>Giai đoạn:</strong> đầu kỳ 23/01–31/03; gần đây 06/01–15/09.",
+          "<strong>Quy đổi công bằng:</strong> token/ngày ÷ ngày từ Assigned Date đến 15/09 (Account_List).",
+          "<strong>Khảo sát limit:</strong> self-report; workaround mượn TK không phản ánh token cá nhân.",
+          "<strong>Gợi ý hành động:</strong> (1) Nâng/phân bổ quota · (2) Giảm mượn TK · (3) Rà license inactive · (4) Chính sách model/Auto.",
+        ],
+        themeLight: "Giao diện sáng",
+        themeDark: "Giao diện tối",
+      },
+      ja: {
+        docTitle: "Cursor AI 導入状況 — 管理報告書",
+        title: "Cursor AI 導入状況 — 管理報告書",
+        meta: "期間 23/01/2026 – 15/09/2026 · Cursor Analytics 正規データ（15/09時点）· ユーザー別トークン：team-usage-events（14/09エクスポート）",
+        conclusionTitle: "要点",
+        conclusion1: "ロールアウト以降、CursorはVN開発メンバーの日常ツールとして定着した。在籍開発者のうち、報告期間を通じて利用ゼロの者はいない。チーム全体の利用強度は期初比おおむね<strong>1.9倍</strong>で、2026年中頃以降は安定的（第1章参照）。",
+        conclusion2: "社内アンケートでは、<strong>約24.4%</strong>が利用上限に達することがある。多くはサイクル後半（第3–4週）に上限到達し、リセット日前にクォータを使い切る（第4章参照）。",
+        sec1: "1 · 推移とフェーズ",
+        chartMonthlyH: "月次 AI イベント数",
+        chartMonthlyN: "09/26は15/09まで · 03/26以降 月あたり約52–54ユーザー",
+        chartIntensityH: "期初 vs 直近",
+        chartIntensityN: "AI 行数（追加+削除）：0.93M → 2.19M 行 · Timeseries",
+        chartMonthlyLabel: "月次 events（Usage API）",
+        chartIntensityLabels: ["期初\n(23/01–31/03)", "直近\n(06–15/09)"],
+        chartIntensitySeries: "1日あたり平均 events",
+        sec2: "2 · 利用分布（アクティブ roster、n=43）",
+        calc: "<strong>算出方法：</strong> トークン/日・イベント/日 ＝ 期間合計 ÷ アカウント付与日から15/09までの日数",
+        rank: "<strong>ランキング：</strong> 複合順位 ＝ 2指標（トークン/日・イベント/日）の順位の平均",
+        sec2Detail: "トークン/日 — Total Tokens（14/09エクスポート）÷ 対象日数。イベント/日 — エクスポート1行＝1イベント。付与日：Account_List。",
+        tableHeaders: ["#","氏名","Team","対象日数","トークン/日（M）","イベント/日","トークン/イベント（K）","トークン・イベント順位"],
+        topH: "利用上位5名（複合順位）",
+        bottomH: "利用下位5名（複合順位）",
+        sec3: "3 · モデル（トークン構成）",
+        modelOther: "その他",
+        model1: "auto および Composer 2.5-fast が、チーム総トークンの約95%（期間合計 約105B）を占める。",
+        model2: "リクエスト単位（Analytics API）でも同傾向：default/Auto が約80%。",
+        sec4: "4 · クォータと上限（社内アンケート）",
+        sec4Note: "<strong>注記：</strong> Cursor の利用上限は毎月23日にリセットされる。",
+        warnTitle: "回答者の約24%が上限到達 — 個人クォータが不足",
+        warnBody: "回答者の約24.4%（<strong>10/41</strong>）が、サイクル内に上限に達することがある。多くは第3–4週に上限到達し、次回リセット<strong>前</strong>にクォータを使い切る。第1–2章の高い利用状況と整合するが、個人上限が需要に追いついていない。暫定対応として、同僚アカウントの借用が普及（上限到達者 <strong>8/10</strong>）。",
+        limitPieH: "サイクル内の上限到達率",
+        limitPieLabels: ["上限到達 (10)", "未到達 (31)"],
+        limitWeekH: "上限到達週（23日起算サイクル）",
+        limitWeekLabels: ["第1週", "第2週", "第3週", "第4週"],
+        limitWeekSeries: "人数",
+        limitWeekN: "多くは第3–4週に上限到達（リセット日前）。",
+        appendixTitle: "付録 — 定義とデータソース",
+        appendixItems: [
+          "<strong>Event（Usage API）：</strong> composer + agent + chat + cmdK + API key の日次合計（正規 CSV）。",
+          "<strong>Event / トークン（ユーザー表）：</strong> team-usage-events の1行＝1イベント。複合順位 ＝（トークン/日順位＋イベント/日順位）÷ 2（利用あり43名）。",
+          "<strong>フェーズ：</strong> 期初 23/01–31/03、直近 06/01–15/09。",
+          "<strong>公平換算：</strong> トークン/日 ＝ 合計 ÷ Assigned Date から15/09までの日数（Account_List）。",
+          "<strong>上限アンケート：</strong> 自己申告。アカウント借用は個人トークンに反映されない。",
+          "<strong>推奨アクション：</strong> (1) クォータ増・再配分 (2) 借用の依存低減 (3) 非アクティブライセンス確認 (4) モデル/Auto のコスト方針。",
+        ],
+        themeLight: "ライト表示",
+        themeDark: "ダーク表示",
+      },
+    };
+
+    let lang = "vi";
+    const charts = [];
+
+    function L() { return I18N[lang]; }
+
+    function setHtml(id, html) {
+      document.getElementById(id).innerHTML = html;
+    }
+
+    function applyStaticText() {
+      const t = L();
+      document.title = t.docTitle;
+      document.documentElement.lang = lang === "ja" ? "ja" : "vi";
+      document.body.setAttribute("data-lang", lang);
+      setHtml("txtTitle", t.title);
+      setHtml("txtMeta", t.meta);
+      setHtml("txtConclusionTitle", t.conclusionTitle);
+      setHtml("txtConclusion1", t.conclusion1);
+      setHtml("txtConclusion2", t.conclusion2);
+      setHtml("txtSec1", t.sec1);
+      setHtml("txtChartMonthlyH", t.chartMonthlyH);
+      setHtml("txtChartMonthlyN", t.chartMonthlyN);
+      setHtml("txtChartIntensityH", t.chartIntensityH);
+      setHtml("txtChartIntensityN", t.chartIntensityN);
+      setHtml("txtSec2", t.sec2);
+      setHtml("txtCalc", t.calc);
+      setHtml("txtRank", t.rank);
+      setHtml("txtSec2Detail", t.sec2Detail);
+      setHtml("txtTopH", t.topH);
+      setHtml("txtBottomH", t.bottomH);
+      setHtml("txtSec3", t.sec3);
+      setHtml("txtModel1", t.model1);
+      setHtml("txtModel2", t.model2);
+      setHtml("txtSec4", t.sec4);
+      setHtml("txtSec4Note", t.sec4Note);
+      setHtml("txtWarnTitle", t.warnTitle);
+      setHtml("txtWarnBody", t.warnBody);
+      setHtml("txtLimitPieH", t.limitPieH);
+      setHtml("txtLimitWeekH", t.limitWeekH);
+      setHtml("txtLimitWeekN", t.limitWeekN);
+      setHtml("txtAppendixTitle", t.appendixTitle);
+      document.getElementById("txtAppendixList").innerHTML =
+        t.appendixItems.map((li) => "<li>" + li + "</li>").join("");
+      updateThemeBtnLabel();
+    }
+
+    function renderTables() {
+      const headers = L().tableHeaders;
+      function renderTable(id, rows) {
+        const el = document.getElementById(id);
+        el.innerHTML =
+          "<thead><tr>" + headers.map((h) => "<th>" + h + "</th>").join("") + "</tr></thead>" +
+          "<tbody>" +
+          rows.map((r) =>
+            "<tr>" + r.map((c, i) => {
+              const cls = i >= 3 ? " num" : "";
+              return "<td class=\"" + cls.trim() + "\">" + c + "</td>";
+            }).join("") + "</tr>"
+          ).join("") +
+          "</tbody>";
+      }
+      renderTable("tblTop", TOP5);
+      renderTable("tblBottom", BOTTOM5);
+    }
+
+    const gridColor = () =>
+      document.body.getAttribute("data-theme") === "light" ? "#ccc" : "#444";
+    const textColor = () =>
+      document.body.getAttribute("data-theme") === "light" ? "#333" : "#ccc";
+
+    function baseOptions(extra) {
+      return Object.assign({
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: textColor() } } },
+        scales: extra && extra.scales
+          ? Object.fromEntries(
+              Object.entries(extra.scales).map(([k, v]) => [
+                k,
+                Object.assign({}, v, {
+                  ticks: Object.assign({}, v.ticks, { color: textColor() }),
+                  grid: Object.assign({}, v.grid, { color: gridColor() }),
+                }),
+              ])
+            )
+          : undefined,
+      }, extra || {});
+    }
+
+    function buildCharts() {
+      const t = L();
+      charts.forEach((c) => c.destroy());
+      charts.length = 0;
+
+      charts.push(new Chart(document.getElementById("chartMonthly"), {
+        type: "line",
+        data: {
+          labels: ["01/26","02/26","03/26","04/26","05/26","06/26","07/26","08/26","09/26"],
+          datasets: [{
+            label: t.chartMonthlyLabel,
+            data: [2230,8032,16260,16704,15238,24822,29552,29602,11388],
+            borderColor: "#3794ff",
+            backgroundColor: "rgba(55,148,255,0.15)",
+            fill: true,
+            tension: 0.2,
+          }],
+        },
+        options: baseOptions({
+          scales: {
+            y: { beginAtZero: true, ticks: {}, grid: {} },
+            x: { ticks: {}, grid: { display: false } },
+          },
+        }),
+      }));
+
+      charts.push(new Chart(document.getElementById("chartIntensity"), {
+        type: "bar",
+        data: {
+          labels: t.chartIntensityLabels,
+          datasets: [{
+            label: t.chartIntensitySeries,
+            data: [465, 891],
+            backgroundColor: "#3794ff",
+          }],
+        },
+        options: baseOptions({
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: {}, grid: {} }, x: { ticks: {}, grid: { display: false } } },
+        }),
+      }));
+
+      charts.push(new Chart(document.getElementById("chartModel"), {
+        type: "doughnut",
+        data: {
+          labels: ["auto","composer-2.5-fast","composer-2.5", t.modelOther],
+          datasets: [{
+            data: [82.4, 12.3, 3.6, 1.7],
+            backgroundColor: ["#3794ff","#4ec9b0","#d19a66","#888"],
+          }],
+        },
+        options: baseOptions({ plugins: { legend: { position: "bottom" } } }),
+      }));
+
+      charts.push(new Chart(document.getElementById("chartLimitPie"), {
+        type: "doughnut",
+        data: {
+          labels: t.limitPieLabels,
+          datasets: [{
+            data: [10, 31],
+            backgroundColor: ["#d19a66", "#4ec9b0"],
+          }],
+        },
+        options: baseOptions({ plugins: { legend: { position: "bottom" } } }),
+      }));
+
+      charts.push(new Chart(document.getElementById("chartLimitWeek"), {
+        type: "bar",
+        data: {
+          labels: t.limitWeekLabels,
+          datasets: [{
+            label: t.limitWeekSeries,
+            data: [0, 2, 4, 5],
+            backgroundColor: "#d19a66",
+          }],
+        },
+        options: baseOptions({
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: {} }, x: { ticks: {}, grid: { display: false } } },
+        }),
+      }));
+    }
+
+    function setLang(next) {
+      lang = next;
+      document.getElementById("langVi").classList.toggle("active", lang === "vi");
+      document.getElementById("langJa").classList.toggle("active", lang === "ja");
+      applyStaticText();
+      renderTables();
+      buildCharts();
+    }
+
+    function updateThemeBtnLabel() {
+      const light = document.body.getAttribute("data-theme") === "light";
+      document.getElementById("themeBtn").textContent = light ? L().themeDark : L().themeLight;
+    }
+
+    document.getElementById("langVi").addEventListener("click", () => setLang("vi"));
+    document.getElementById("langJa").addEventListener("click", () => setLang("ja"));
+
+    document.getElementById("themeBtn").addEventListener("click", () => {
+      const body = document.body;
+      const light = body.getAttribute("data-theme") === "light";
+      body.setAttribute("data-theme", light ? "dark" : "light");
+      updateThemeBtnLabel();
+      buildCharts();
+    });
+
+    setLang("vi");
+  </script>
+</body>
+</html>
