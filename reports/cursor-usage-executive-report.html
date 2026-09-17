@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -40,16 +40,24 @@
       color: var(--text);
     }
     .wrap { max-width: 1080px; margin: 0 auto; padding: 24px; }
-    header { margin-bottom: 20px; padding-right: 200px; }
+    .page-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    header { flex: 1 1 280px; min-width: 0; }
     h1 { font-size: 24px; font-weight: 600; margin: 0 0 4px; }
     .meta { color: var(--muted); font-size: 13px; }
     .toolbar {
-      float: right;
-      margin-top: -36px;
+      flex: 0 0 auto;
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       justify-content: flex-end;
+      align-items: center;
     }
     .toolbar button {
       background: var(--surface);
@@ -84,8 +92,8 @@
     }
     @media (max-width: 720px) {
       .grid-2 { grid-template-columns: 1fr; }
-      header { padding-right: 0; }
-      .toolbar { float: none; margin: 0 0 12px; }
+      .page-head { flex-direction: column; }
+      .toolbar { width: 100%; justify-content: flex-start; }
     }
     .card {
       background: var(--surface);
@@ -119,17 +127,19 @@
     }
   </style>
 </head>
-<body data-theme="dark" data-lang="vi">
+<body data-theme="light" data-lang="ja">
   <div class="wrap">
-    <div class="toolbar">
-      <button type="button" id="langVi" class="active">Tiếng Việt</button>
-      <button type="button" id="langJa">日本語</button>
-      <button type="button" id="themeBtn">Giao diện sáng</button>
+    <div class="page-head">
+      <header>
+        <h1 id="txtTitle"></h1>
+        <p class="meta" id="txtMeta"></p>
+      </header>
+      <div class="toolbar">
+        <button type="button" id="langVi">Tiếng Việt</button>
+        <button type="button" id="langJa" class="active">日本語</button>
+        <button type="button" id="themeBtn"></button>
+      </div>
     </div>
-    <header>
-      <h1 id="txtTitle"></h1>
-      <p class="meta" id="txtMeta"></p>
-    </header>
 
     <div class="callout info">
       <div class="callout-title" id="txtConclusionTitle"></div>
@@ -327,7 +337,7 @@
       },
     };
 
-    let lang = "vi";
+    let lang = "ja";
     const charts = [];
 
     function L() { return I18N[lang]; }
@@ -524,7 +534,7 @@
       buildCharts();
     });
 
-    setLang("vi");
+    setLang("ja");
   </script>
 </body>
 </html>
